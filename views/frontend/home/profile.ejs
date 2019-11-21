@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= pageTitle %></title>
+    <% include ../../layouts/stylesheet %>
+    <% include ../../layouts/script %>
+</head>
+<body>
+    <% include ../../layouts/navbar %>
+    <br>
+    <div class="container">
+        <div class="row profile">
+            <h4>Profile</h4><br>
+            <div class="col-md-4 avatar">
+                <img src="<%= user.image_path %>" alt="Avatar">
+            </div>
+            <div class="col-md-8 info">
+                <p>Full name: <%= user.info.firstname %> <%= user.info.lastname %></p>
+                <p>E-mail: <%= user.local.email %></p>
+                <p>Roles: <%= user.roles %></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

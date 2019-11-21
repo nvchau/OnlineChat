@@ -1,0 +1,182 @@
+<div class="col-sm-3 sidenav no-padding">
+    <div class="left">
+        <div class="top form-group">
+            <select class="form-control" id="select-type-chat">
+                <option data-target="#all-chat" value="all-chat">All conversation</option>
+                <option data-target="#user-chat" value="personal-chat">Personal conversation</option>
+                <option data-target="#group-chat" value="group-chat">Group conversation</option>
+            </select>
+            <a href="#groupChatModal" class="create-group-chat" data-toggle="modal" 
+                title="Tạo một nhóm trò chuyện mới"></a>
+        </div>
+        <!-- all chat -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="all-chat">
+                <ul class="people no-padding-start">
+                    <% member.forEach(function(member_item, index){ %>
+                        <% if (member_item._id.toString() !== user._id.toString()) { %>
+                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
+                                <li class="person" data-chat="<%= member_item._id %>">
+                                    <div class="left-avatar">
+                                        <div class="dot online"></div>
+                                        <img src="<%= member_item.image_path %>" alt="">
+                                    </div>
+
+                                    <span class="name">
+                                        <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                    </span><br>
+                                    <span class="time"></span>
+                                    <span class="preview"></span>
+
+                                    <!-- hiển thị thời gian của tin nhắn cuối cùng -->
+                                    <!-- <span class="time">
+                                        <% messages.forEach(function(message_item, index){ %>
+                                            <% if (message_item.conversationType === 'personal') { %>
+                                                <% if ((member_item._id.toString() === message_item.receiverId && user._id.toString() === message_item.senderId)
+                                                || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
+                                                    <% if (message_item.messageType === 'text') { %>
+                                                        <% if (index === messages.length - 1) { %>
+                                                            
+                                                            <%= moment(message_item.createdAt).locale("vi").fromNow(); %>
+                                                            
+                                                        <% } %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                        <% }); %>
+                                    </span> -->
+
+                                    <!-- hiển thị tin nhắn cuối cùng -->
+                                    <!-- <span class="preview">
+                                        <% messages.forEach(function(message_item, index){ %>
+                                            <% if (message_item.conversationType === 'personal') { %>
+                                                <% if ((member_item._id.toString() === message_item.receiverId && user._id.toString() === message_item.senderId)
+                                                || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
+                                                    <% if (message_item.messageType === 'text') { %>
+                                                        <% if (index === messages.length - 1) { %>
+                                                            
+                                                            <%= message_item.text.substring(0, 20) %>...
+                                                            
+                                                        <% } %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                        <% }); %>
+                                    </span> -->
+                                </li>
+                            </a>
+                        <% } %>
+                    <% }); %>
+
+                    <% group.forEach(function(group_item, index){ %>
+                        <% group_item.members.map(function(item){ %>
+                            <% if (item.toString() === user._id.toString()) { %>
+                                <a href="#gid_<%= group_item._id %>" class="room-chat" data-target="#to_<%= group_item._id %>">
+                                    <li class="person group-chat" data-chat="<%= group_item._id %>">
+                                        <div class="left-avatar">
+                                            <!-- <div class="dot"></div> -->
+                                            <img src="<%= group_item.image_path %>" alt="">
+                                        </div>
+
+                                        <span class="name">
+                                            <span class="group-chat-name">Group:</span> <%= group_item.name %>
+                                        </span>
+                                        <span class="time"></span>
+                                        <span class="preview"></span>
+                                        
+                                        <!-- <span class="time">
+                                            <% messages.forEach(function(message_item, index){ %>
+                                                <% if (message_item.conversationType === 'group') { %>
+                                                    <% if (group_item._id.toString() === message_item.receiverId) { %>
+                                                        <% if (message_item.messageType === 'text') { %>
+                                                            <% if (index === messages.length - 1) { %>
+                                                                
+                                                                <%= moment(message_item.createdAt).locale("vi").fromNow(); %>
+                                                                
+                                                            <% } %>
+                                                        <% } %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% }); %>
+                                        </span> -->
+
+                                        <!-- <span class="preview">
+                                            <% messages.forEach(function(message_item, index){ %>
+                                                <% if (message_item.conversationType === 'group') { %>
+                                                    <% if (group_item._id.toString() === message_item.receiverId) { %>
+                                                        <% if (message_item.messageType === 'text') { %>
+                                                            <% if (index === messages.length - 1) { %>
+                                                            
+                                                                <%= message_item.text.substring(0, 20) %>...
+                                                                
+                                                            <% } %>
+                                                        <% } %>
+                                                    <% } %>
+                                                <% } %>
+                                            <% }); %>
+                                        </span> -->
+                                    </li>
+                                </a>
+                            <% } %>
+                        <% }) %>
+                    <% }); %>
+                </ul>
+                <div class="load_more_chat">
+                    <a href="">Load more...</a>
+                </div>
+            </div>
+            <!-- user chat -->
+            <div class="tab-pane" id="user-chat">
+                <ul class="people no-padding-start">
+                    <% member.forEach(function(member_item, index){ %>
+                        <% if (member_item._id.toString() !== user._id.toString()) { %>
+                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
+                                <li class="person" data-chat="<%= member_item._id %>">
+                                    <div class="left-avatar">
+                                        <div class="dot online"></div>
+                                        <img src="<%= member_item.image_path %>" alt="">
+                                    </div>
+                                    <span class="name">
+                                        <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                    </span><br>
+                                    <span class="time"></span>
+                                    <span class="preview"></span>
+                                </li>
+                            </a>
+                        <% } %>
+                    <% }); %>
+                </ul>
+                <div class="load_more_chat">
+                    <a href="">Load more...</a>
+                </div>
+            </div>
+            <!-- group chat -->
+            <div class="tab-pane" id="group-chat">
+                <ul class="people no-padding-start">
+                    <% group.forEach(function(group_item, index){ %>
+                        <% group_item.members.map(function(item){ %>
+                            <% if (item.toString() === user._id.toString()) { %>
+                                <a href="#gid_<%= group_item._id %>" class="room-chat" data-target="#to_<%= group_item._id %>">
+                                    <li class="person group-chat" data-chat="<%= group_item._id %>">
+                                        <div class="left-avatar">
+                                            <!-- <div class="dot"></div> -->
+                                            <img src="<%= group_item.image_path %>" alt="">
+                                        </div>
+                                        <span class="name">
+                                            <span class="group-chat-name">Group:</span> <%= group_item.name %>
+                                        </span>
+                                        <span class="time"></span>
+                                        <span class="preview"></span>
+                                    </li>
+                                </a>
+                            <% } %>
+                        <% }) %>
+                    <% }); %>
+                </ul>
+                <div class="load_more_chat">
+                    <a href="">Load more...</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

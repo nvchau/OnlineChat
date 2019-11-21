@@ -1,0 +1,175 @@
+<div class="col-sm-9 sidenav no-padding">
+    <div class="tab-content" id="screen_chat">
+        <!-- person -->
+        <!-- <div class="right tab-pane active" data-chat="<%= user._id %>" id="to_<%= user._id %>" style="color: green; text-align: center;">
+            <h3>WELCOME TO WEBCHAT</h3>
+            <h4>Hi <%= user.info.firstname %> <%= user.info.lastname %></h4>
+        </div> -->
+
+        <!-- chat personal -->
+        <% member.forEach(function(member_item, index){ %>
+            <div class="right tab-pane" data-chat="<%= member_item._id %>" id="to_<%= member_item._id %>"> <!-- thêm vào class để active phần tử đầu: <% if(index === 0) { %> active <% } %> -->
+                
+                <div class="top">
+                    <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
+                    <span class="chat-menu-right">
+                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= member_item._id %>" data-toggle="modal" title="Video call">
+                            <i class="fa fa-video-camera" style="font-size: 25px;"></i>
+                        </a>
+                    </span>
+                </div>
+                <!-- <div class="top">
+                    <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
+                    <span class="chat-menu-right">
+                        <a href="#attachsModal" id="show-attachs" data-toggle="modal">
+                            Tệp đính kèm
+                            <i class="fa fa-paperclip"></i>
+                        </a>
+                    </span>
+                    <span class="chat-menu-right">
+                        <a href="javascript:void(0)">&nbsp;</a>
+                    </span>
+                    <span class="chat-menu-right">
+                        <a href="#imagesModal" id="show-images" data-toggle="modal">
+                            Hình ảnh
+                            <i class="fa fa-photo"></i>
+                        </a>
+                    </span>
+                </div> -->
+                
+                <div class="content-chat">
+                    <div class="chat" data-chat="<%= member_item._id %>">
+                        <% messages.forEach(function(message_item, index){ %>
+                            <% if (message_item.conversationType === 'personal') { %>
+                                <% if ((member_item._id.toString() === message_item.receiverId && user._id.toString() === message_item.senderId)
+                                || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
+                                    <!-- kiểu text -->
+                                    <% if (message_item.messageType === 'text') { %>
+                                        <div class="bubble
+                                            <% if(message_item.senderId.toString() === user._id.toString()) { %> me
+                                            <% } else { %> you <% } %>"
+                                            data-mess-id="<%= message_item._id %>">
+                                            <!-- <img class="avatar-small" src="<%= message_item.sender.avatar %>" title="<%= message_item.sender.name %>" alt="<%= message_item.sender.avatar %>"> -->
+                                            <%= message_item.text %>
+                                            <br>
+                                            <span class="time-chat"><%= moment(message_item.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY'); %></span>
+                                        </div>
+                                    <% } %>
+                                    <!-- kiểu hình ảnh -->
+                                    <!-- <% if (message_item.messageType === 'image') { %>
+                                        
+                                    <% } %> -->
+                                    <!-- kiểu file -->
+                                    <!-- <% if (message_item.messageType === 'file') { %>
+                                        
+                                    <% } %> -->
+                                <% } %>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </div>
+                
+                <div class="write" data-chat="<%= member_item._id %>">
+                    <input type="text" class="write-chat" id="write-chat-<%= member_item._id %>" data-chat="<%= member_item._id %>">
+                    <div class="icons">
+                        <a href="#" class="icon-chat" data-chat="<%= member_item._id %>"><i class="fa fa-smile-o"></i></a>
+                        <!-- <label for="image-chat">
+                            <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="<%= member_item._id %>">
+                            <i class="fa fa-photo"></i>
+                        </label>
+                        <label for="attach-chat">
+                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="<%= member_item._id %>">
+                            <i class="fa fa-paperclip"></i>
+                        </label>
+                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= member_item._id %>" data-toggle="modal">
+                            <i class="fa fa-video-camera"></i>
+                        </a> -->
+                        <input type="hidden" id="peer-id" value="">
+                    </div>
+                </div>
+            
+            </div>
+        <% }); %>
+        
+        <!-- chat group -->
+        <% group.forEach(function(group_item, index){ %>
+            <div class="right tab-pane" data-chat="<%= group_item._id %>" id="to_<%= group_item._id %>">
+                
+                <div class="top">
+                    <span>To: <span class="name"><%= group_item.name %></span></span>
+                    <span class="chat-menu-right">
+                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal" title="Video call">
+                            <i class="fa fa-video-camera" style="font-size: 25px;"></i>
+                        </a>
+                    </span>
+                </div>
+                
+                <div class="content-chat">
+                    <div class="chat" data-chat="<%= group_item._id %>">
+                        <% messages.forEach(function(message_item, index){ %>
+                            <% if (message_item.conversationType === 'group') { %>
+                                <% if (group_item._id.toString() === message_item.receiverId) { %>
+                                    <!-- kiểu text -->
+                                    <% if (message_item.messageType === 'text') { %>
+                                        <div class="bubble
+                                            <% if(message_item.senderId.toString() === user._id.toString()) { %> me
+                                            <% } else { %> you <% } %>"
+                                            data-mess-id="<%= message_item._id %>">
+                                            <img class="avatar-small" src="<%= message_item.sender.avatar %>" title="<%= message_item.sender.name %>" alt="<%= message_item.sender.avatar %>">
+                                            <%= message_item.text %>
+                                            <br>
+                                            <span class="time-chat"><%= moment(message_item.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY'); %></span>
+                                        </div>
+                                    <% } %>
+                                    <!-- kiểu hình ảnh -->
+                                    <!-- <% if (message_item.messageType === 'image') { %>
+                                        
+                                    <% } %> -->
+                                    <!-- kiểu file -->
+                                    <!-- <% if (message_item.messageType === 'file') { %>
+                                        
+                                    <% } %> -->
+                                <% } %>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </div>
+                
+                <div class="write" data-chat="<%= group_item._id %>">
+                    <input type="text" class="write-chat chat-in-group" id="write-chat-<%= group_item._id %>" data-chat="<%= group_item._id %>">
+                    <div class="icons">
+                        <a href="#" class="icon-chat" data-chat="<%= group_item._id %>"><i class="fa fa-smile-o"></i></a>
+                        <!-- <label for="image-chat">
+                            <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="<%= group_item._id %>">
+                            <i class="fa fa-photo"></i>
+                        </label>
+                        <label for="attach-chat">
+                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="<%= group_item._id %>">
+                            <i class="fa fa-paperclip"></i>
+                        </label>
+                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal">
+                            <i class="fa fa-video-camera"></i>
+                        </a> -->
+                        <input type="hidden" id="peer-id" value="">
+                    </div>
+                </div>
+            
+            </div>
+        <% }); %>
+    </div>
+
+    <!-- <button id="inputClick" onclick="getValueInput()">Get value input</button> -->
+</div>
+
+
+<script>
+    // sự kiện nhấn enter
+    // $('.write-chat').keypress(function (e) {
+    //     if (e.keyCode == 13) {
+    //         var inputValue = $('.write-chat').val();
+    //         $('.chat').append(`<div class="bubble me">`+ inputValue +`</div>`);
+    //         $('.write-chat').val('');
+    //     }
+    // });
+
+</script>

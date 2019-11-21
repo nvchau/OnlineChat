@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= pageTitle %></title>
+    <% include ../../layouts/stylesheet %>
+</head>
+<body onload="spinLoaded()">
+    <% include ../../layouts/navbar %>
+
+    <div class="container-fluid">
+        <div class="row content">
+            <!-- left -->
+            <% include sections/leftSidenav %>
+            <!-- right -->
+            <% include sections/rightSidenav %>
+
+            <!-- modal tao group chat moi -->
+            <% include modals/createGroupChat %>
+        </div>
+    </div>
+
+    <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
+    <input type="hidden" name="currentUser" id="currentUser" value="<%= user.info.firstname %> <%= user.info.lastname %>">
+
+    <% include ../../layouts/script %>
+</body>
+    <script>
+        var currentUser = $('#currentUser').val();
+        alertify.success(`<h5>Hello, ${currentUser}</h5>`);
+    </script>
+</html>
