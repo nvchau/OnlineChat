@@ -14,8 +14,8 @@ var memberSchema = new Schema({
     image_path: String,
     roles: String, //ADMIN, MOD, MEMBER, VIP
     status: String, //ACTIVE, INACTIVE, SUSPENDED
-    createdAt: {type: Number, default: Date.now},
-    updatedAt: {type: Number, default: null}
+    createdAt: {type: String, default: new Date()},
+    updatedAt: {type: String, default: null}
 }, {
     timestamps: true
 });

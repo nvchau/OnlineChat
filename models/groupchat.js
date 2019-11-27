@@ -8,8 +8,8 @@ var groupChatSchema = new Schema({
     user_id: String,
     image_path: String,
     members: Array,
-    createdAt: {type: Number, default: Date.now},
-    updatedAt: {type: Number, default: null}
+    createdAt: {type: String, default: new Date()},
+    updatedAt: {type: String, default: null}
 }, {
     timestamps: true
 });

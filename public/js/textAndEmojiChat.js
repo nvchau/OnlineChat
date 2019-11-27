@@ -98,17 +98,13 @@ $(document).ready(function () {
             // sử dụng senderId vì: ở cient khác, sẽ hiển thị tn ở conversation của người gửi 
             divId = data.message.senderId;
 
-            // nếu id của người nhận bằng id người đang đăng nhập thì mới hiển thị tn (người dùng ở client khác)
+            // nếu id của người nhận bằng id người đang đăng nhập thì mới hiển thị tn (id của người dùng ở client khác)
             var currentUser = $('#currentUserId').val();
             if (data.personalId == currentUser){
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
                 nineScrollRight(divId);
             }
         }
-
-        // $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
-        // nineScrollRight(divId);
-        // ĐANG LÀM Ở ĐÂY: LỖI - HIỂN THỊ TIN NHẮN QUÁ SOCKET CHƯA ĐÚNG
 
     })
 })

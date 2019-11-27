@@ -23,7 +23,11 @@
                                     </div>
 
                                     <span class="name">
-                                        <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
+                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
+                                        <% } else { %>
+                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                        <% } %>
                                     </span><br>
                                     <span class="time"></span>
                                     <span class="preview"></span>
@@ -67,7 +71,9 @@
                             </a>
                         <% } %>
                     <% }); %>
+                </ul>
 
+                <ul class="people no-padding-start group">
                     <% group.forEach(function(group_item, index){ %>
                         <% group_item.members.map(function(item){ %>
                             <% if (item.toString() === user._id.toString()) { %>
@@ -79,7 +85,13 @@
                                         </div>
 
                                         <span class="name">
-                                            <span class="group-chat-name">Group:</span> <%= group_item.name %>
+                                            <span class="group-chat-name">
+                                                <% if(group_item.name.length > 15) { %>
+                                                    <%= group_item.name.substring(0, 14) %><span>...</span>
+                                                <% } else { %>
+                                                    <%= group_item.name %>
+                                                <% } %>
+                                            </span>
                                         </span>
                                         <span class="time"></span>
                                         <span class="preview"></span>
@@ -121,9 +133,10 @@
                         <% }) %>
                     <% }); %>
                 </ul>
-                <div class="load_more_chat">
+
+                <!-- <div class="load_more_chat">
                     <a href="">Load more...</a>
-                </div>
+                </div> -->
             </div>
             <!-- user chat -->
             <div class="tab-pane" id="user-chat">
@@ -137,7 +150,11 @@
                                         <img src="<%= member_item.image_path %>" alt="">
                                     </div>
                                     <span class="name">
-                                        <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
+                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
+                                        <% } else { %>
+                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                        <% } %>
                                     </span><br>
                                     <span class="time"></span>
                                     <span class="preview"></span>
@@ -146,13 +163,13 @@
                         <% } %>
                     <% }); %>
                 </ul>
-                <div class="load_more_chat">
+                <!-- <div class="load_more_chat">
                     <a href="">Load more...</a>
-                </div>
+                </div> -->
             </div>
             <!-- group chat -->
             <div class="tab-pane" id="group-chat">
-                <ul class="people no-padding-start">
+                <ul class="people no-padding-start group">
                     <% group.forEach(function(group_item, index){ %>
                         <% group_item.members.map(function(item){ %>
                             <% if (item.toString() === user._id.toString()) { %>
@@ -163,7 +180,13 @@
                                             <img src="<%= group_item.image_path %>" alt="">
                                         </div>
                                         <span class="name">
-                                            <span class="group-chat-name">Group:</span> <%= group_item.name %>
+                                            <span class="group-chat-name">
+                                                <% if(group_item.name.length > 15) { %>
+                                                    <%= group_item.name.substring(0, 14) %><span>...</span>
+                                                <% } else { %>
+                                                    <%= group_item.name %>
+                                                <% } %>
+                                            </span>
                                         </span>
                                         <span class="time"></span>
                                         <span class="preview"></span>
@@ -173,9 +196,9 @@
                         <% }) %>
                     <% }); %>
                 </ul>
-                <div class="load_more_chat">
+                <!-- <div class="load_more_chat">
                     <a href="">Load more...</a>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

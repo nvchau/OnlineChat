@@ -12,11 +12,11 @@
                 
                 <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
-                    <span class="chat-menu-right">
+                    <!-- <span class="chat-menu-right">
                         <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= member_item._id %>" data-toggle="modal" title="Video call">
                             <i class="fa fa-video-camera" style="font-size: 25px;"></i>
                         </a>
-                    </span>
+                    </span> -->
                 </div>
                 <!-- <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
@@ -98,8 +98,9 @@
                 <div class="top">
                     <span>To: <span class="name"><%= group_item.name %></span></span>
                     <span class="chat-menu-right">
-                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal" title="Video call">
-                            <i class="fa fa-video-camera" style="font-size: 25px;"></i>
+                        <a href="#memberGroup_<%= group_item._id %>" data-toggle="modal" data-target="#memberGroup_<%= group_item._id %>">
+                            Members &nbsp;
+                            <i class="fa fa-users"></i>
                         </a>
                     </span>
                 </div>

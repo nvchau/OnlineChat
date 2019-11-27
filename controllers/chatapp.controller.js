@@ -97,3 +97,59 @@ exports.addNewTextEmoji = (req, res, next) => {
 
 }
 
+// tìm kiếm user để thêm vào group chat
+exports.searchUsers = (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+        let keywork = req.params.keywork;
+        // tìm kiếm theo email hoặc tên
+        Member.find({
+            $or: [
+                {"local.email": new RegExp(keywork, 'i')},
+                {"info.firstname": new RegExp(keywork, 'i')},
+                {"info.lastname": new RegExp(keywork, 'i')}
+            ]
+        })
+        .then(usersListSearch => {
+            return res.status(200).send({usersListSearch: usersListSearch});
+        })
+        .catch(error => {
+            return res.status(500).send(error);
+        });
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+exports.createGroupChat = (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+
+        let arrayIds = req.body.arrayIds;
+        let groupChatName = req.body.groupChatName;
+
+        var listUserId = JSON.parse(arrayIds); // đưa JSON về lại array
+        listUserId.push(currentUserId); // thêm current userId vào mảng memberId
+
+        let newGroup = new Group();
+
+        newGroup.status     = "ACTIVE";
+        newGroup.name       = groupChatName;
+        newGroup.user_id    = currentUserId;
+        newGroup.image_path = "images/avatar/avatar-group.png";
+        newGroup.members    = listUserId;
+        newGroup.createdAt  = new Date();
+
+        newGroup.save(function (error, docs) {
+            if (error) {
+                return res.status(500).send(error);
+            }
+
+            return res.status(200).send(docs);
+        });
+
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+

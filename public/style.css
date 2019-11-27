@@ -1275,12 +1275,12 @@ label:focus,
   border-color: #ccc;
 }
 
-.list-user-added button#create-group-chat {
+.list-user-added button#btn-create-group-chat {
   border-color: #2ACC77;
   background-color: #2ACC77;
 }
 
-.list-user-added button#cancel-group-chat {
+.list-user-added button#btn-cancel-group-chat {
   border-color: #ff7675;
   background-color: #ff7675;
   margin-left: 5px;
@@ -1337,5 +1337,9 @@ label:focus,
   width: 100%;
   border: 5px solid white;
   border-radius: 5px;
+}
+
+.list-members {
+  list-style-type: none;
 }
 /* =============================== */

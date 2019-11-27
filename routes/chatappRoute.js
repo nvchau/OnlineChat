@@ -9,4 +9,8 @@ router.get('/', passport.isLoggedIn, chatapp_controller.home);
 
 router.post('/message/add-new-text-emoji', passport.isLoggedIn, chatapp_controller.addNewTextEmoji);
 
+router.get('/search-user/:keywork', passport.isLoggedIn, chatapp_controller.searchUsers);
+
+router.post('/group-chat/create-new-group', passport.isLoggedIn, chatapp_controller.createGroupChat);
+
 module.exports = router;

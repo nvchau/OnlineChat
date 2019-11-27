@@ -31,14 +31,19 @@ io.on("connection", function(socket) {
     socket.on("disconnect", function(){
         console.log(socket.id + "-> Disconnected!");
     });
+    // console.log(socket.adapter.rooms); // show ra tất cả các room đang có
 
+    // lắng nghe client gửi tin nhắn (kèm emoji) lên
     socket.on("chat-text-emoji", function(data) {
-        // gửi lại tn đến tất cả client
-        // io.sockets.emit("send-back-data-chat", data);
+        // io.sockets.emit("send-back-data-chat", data); // gửi lại tn đến tất cả client
         socket.broadcast.emit("send-back-data-chat", data); // gửi đến các client còn lại, trừ người gửi
     })
 
-    // console.log(socket.adapter.rooms); // show ra tất cả các room đang có
+    // lắng nghe sự kiện client tạo group mới
+    socket.on("new-group-created", function(data) {
+        // console.log(data.groupChat);
+        socket.broadcast.emit("send-back-data-group-chat", data.groupChat);
+    })
 });
 // ===============================================================
 // ===============================================================

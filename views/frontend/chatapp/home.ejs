@@ -7,7 +7,7 @@
     <title><%= pageTitle %></title>
     <% include ../../layouts/stylesheet %>
 </head>
-<body onload="spinLoaded()">
+<body>
     <% include ../../layouts/navbar %>
 
     <div class="container-fluid">
@@ -19,6 +19,8 @@
 
             <!-- modal tao group chat moi -->
             <% include modals/createGroupChat %>
+            <!-- modal danh sách thành viên group -->
+            <% include modals/memberOfGroup %>
         </div>
     </div>
 

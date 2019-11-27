@@ -12,7 +12,8 @@ var passport = require('../config/passport');
 // router.get('/vi', home_controller.lang_vi);
 
 /* GET home page. */
-router.get('/', home_controller.index);
+// router.get('/', home_controller.index);
+router.get('/', passport.notLoggedIn, home_controller.login);
 
 router.get('/login', passport.notLoggedIn, home_controller.login);
 router.post('/login', home_controller.postLogin);
