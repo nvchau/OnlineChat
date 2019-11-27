@@ -99,7 +99,7 @@
                     <span>To: <span class="name"><%= group_item.name %></span></span>
                     <span class="chat-menu-right">
                         <a href="#memberGroup_<%= group_item._id %>" data-toggle="modal" data-target="#memberGroup_<%= group_item._id %>">
-                            Members &nbsp;
+                            Members (<%= group_item.members.length %>) &nbsp;
                             <i class="fa fa-users"></i>
                         </a>
                     </span>
