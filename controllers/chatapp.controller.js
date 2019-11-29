@@ -140,12 +140,22 @@ exports.createGroupChat = (req, res, next) => {
         newGroup.members    = listUserId;
         newGroup.createdAt  = new Date();
 
-        newGroup.save(function (error, docs) {
-            if (error) {
-                return res.status(500).send(error);
-            }
+        // tìm các user là member của group mới được tạo
+        Member.find({
+            '_id': { $in: listUserId }
+        }, function(err, memberList) {
+            // console.log(userData);
+            // lưu group mới tạo vào db và gửi trả về cho client
+            newGroup.save(function (error, docs) {
+                if (error) {
+                    return res.status(500).send(error);
+                }
 
-            return res.status(200).send(docs);
+                return res.status(200).send({
+                    groupData: docs, // dữ liệu của group mới tạo
+                    memberList: memberList // danh sách member
+                });
+            });
         });
 
     } catch (error) {

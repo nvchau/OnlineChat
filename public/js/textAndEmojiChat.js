@@ -28,7 +28,8 @@ function textAndEmojiChat(divId) {
             // console.log(dataTextEmojiForSend);
 
             // gửi dữ liệu lên server
-            $.post('/chatapp/message/add-new-text-emoji', dataTextEmojiForSend, function(data) {
+            $.post('/chatapp/message/add-new-text-emoji', dataTextEmojiForSend,
+            function(data) { // nhận lại data từ server
                 // success
                 // console.log(data.message);
 

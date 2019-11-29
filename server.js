@@ -42,7 +42,7 @@ io.on("connection", function(socket) {
     // lắng nghe sự kiện client tạo group mới
     socket.on("new-group-created", function(data) {
         // console.log(data.groupChat);
-        socket.broadcast.emit("send-back-data-group-chat", data.groupChat);
+        socket.broadcast.emit("send-back-data-group-chat", data);
     })
 });
 // ===============================================================

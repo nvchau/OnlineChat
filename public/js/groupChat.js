@@ -39,7 +39,8 @@ function callSearchUser(element) {
             return false;
         }
 
-        $.get(`/chatapp/search-user/${keyword}`, function(data) {
+        $.get(`/chatapp/search-user/${keyword}`, // gửi keyword qua params
+        function(data) { // nhận lại data từ server
             var currentUser = $('#currentUserId').val();
             // mỗi lần tìm kiếm thì làm sạch list cũ
             $('ul#group-chat-friends').html('');
@@ -104,25 +105,25 @@ function callCreateGroupChat() {
         $.post("/chatapp/group-chat/create-new-group", {
             arrayIds: JSON.stringify(arrayIds), // đưa array về JSON để gửi lên server
             groupChatName: groupChatName
-
-        }, function(data) {
-            // console.log(data);
+        }, function(data) { // nhận lại data từ server
+            // console.log(data.memberList);
+            // console.log(data.groupData);
             // Ẩn modal
             $('#btn-cancel-group-chat').click(); // click gọi lại hàm cancelCreateGroup để reset modal
             $('#groupChatModal').modal("hide");
 
             // hiển thị group mới tạo lên leftSide
-            letSubStringGroupName = data.name; // kiểm tra độ dài của tên group, nếu quá 15 thì ẩn bớt
+            letSubStringGroupName = data.groupData.name; // kiểm tra độ dài của tên group, nếu quá 15 thì ẩn bớt
             if (letSubStringGroupName.length > 15) {
                 letSubStringGroupName = letSubStringGroupName.substring(0, 14) + '<span>...</span>';
             };
 
             let leftSide = `
-                <a href="#uid_${data._id}" class="room-chat" id="null-contact" data-target="#to_${data._id}">
-                    <li class="person" data-chat="${data._id}">
+                <a href="#uid_${data.groupData._id}" class="room-chat" id="null-contact" data-target="#to_${data.groupData._id}">
+                    <li class="person" data-chat="${data.groupData._id}">
                         <div class="left-avatar">
                             <div class="dot online"></div>
-                            <img src="${data.image_path}" alt="">
+                            <img src="${data.groupData.image_path}" alt="">
                         </div>
 
                         <span class="name">
@@ -141,34 +142,34 @@ function callCreateGroupChat() {
 
             // Đổ ra khung chat bên rightSide
             let rightSideData = `
-                <div class="right tab-pane" data-chat="${data._id}" id="to_${data._id}">
+                <div class="right tab-pane" data-chat="${data.groupData._id}" id="to_${data.groupData._id}">
                     <div class="top">
-                        <span>To: <span class="name">${data.name}</span></span>
+                        <span>To: <span class="name">${data.groupData.name}</span></span>
                         <span class="chat-menu-right">
-                            <a href="#memberGroup_${data._id}" data-toggle="modal" data-target="#memberGroup_${data._id}">
-                                Members &nbsp;
+                            <a href="#memberGroup_${data.groupData._id}" data-toggle="modal" data-target="#memberGroup_${data.groupData._id}">
+                                Members (${data.memberList.length}) &nbsp;
                                 <i class="fa fa-users"></i>
                             </a>
                         </span>
                     </div>
                     
                     <div class="content-chat">
-                        <div class="chat" data-chat="${data._id}"></div>
+                        <div class="chat" data-chat="${data.groupData._id}"></div>
                     </div>
                     
-                    <div class="write" data-chat="${data._id}">
-                        <input type="text" class="write-chat chat-in-group" id="write-chat-${data._id}" data-chat="${data._id}">
+                    <div class="write" data-chat="${data.groupData._id}">
+                        <input type="text" class="write-chat chat-in-group" id="write-chat-${data.groupData._id}" data-chat="${data.groupData._id}">
                         <div class="icons">
-                            <a href="#" class="icon-chat" data-chat="${data._id}"><i class="fa fa-smile-o"></i></a>
+                            <a href="#" class="icon-chat" data-chat="${data.groupData._id}"><i class="fa fa-smile-o"></i></a>
                             <!-- <label for="image-chat">
-                                <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data._id}">
+                                <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data.groupData._id}">
                                 <i class="fa fa-photo"></i>
                             </label>
                             <label for="attach-chat">
-                                <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data._id}">
+                                <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data.groupData._id}">
                                 <i class="fa fa-paperclip"></i>
                             </label>
-                            <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data._id}" data-toggle="modal">
+                            <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data.groupData._id}" data-toggle="modal">
                                 <i class="fa fa-video-camera"></i>
                             </a> -->
                             <input type="hidden" id="peer-id" value="">
@@ -177,14 +178,56 @@ function callCreateGroupChat() {
                 
                 </div>
             `;
-
+            // đẩy bảng chat của group mới lên html
             $('#screen_chat').prepend(rightSideData);
+
+            // tạo modal chứa member của group mới tạo
+            let memberListOfNewGroup = `
+                <div class="modal fade" id="memberGroup_${data.groupData._id}" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Members list: <span class="group-chat-name">${data.groupData.name}</span></h4>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="list-members"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // đẩy lên html danh sách member của group mới tạo
+            $('.content').append(memberListOfNewGroup); // đẩy khung modal lên
+            for(const memberList_item of data.memberList){ // đẩy list member lên modal
+                $(`.content div#memberGroup_${data.groupData._id} .modal-content .modal-body .list-members`).append(
+                    `<div data-uid="${memberList_item._id}">
+                        <li data-uid="${memberList_item._id}">
+                            <div class="contactPanel">
+                                <div class="row"></div>
+                                <div class="user-avatar">
+                                    <img src="${memberList_item.image_path}" alt="">
+                                </div>
+                                <div class="user-name">
+                                    <p>
+                                        &nbsp ${memberList_item.info.firstname} ${memberList_item.info.lastname}
+                                    </p>
+                                </div>
+                                <br>
+                                <div class="user-address">
+                                    &nbsp ${memberList_item.local.email}
+                                </div>
+                            </div>
+                        </li>
+                    </div>`
+                );
+            };
 
             // gọi lại hàm changeScreenChat để thay đổi màn hình chat
             changeScreenChat();
 
             // emit group vừa tạo (data) lên server để socket trả về cho các user còn lại
-            socket.emit("new-group-created", {groupChat: data});
+            socket.emit("new-group-created", data); // dữ liệu gửi lên là 1 object: data
 
         }).fail(function(response) {
             // errors
@@ -200,21 +243,23 @@ $(document).ready(function() {
     callCreateGroupChat();
 
     // lắng nghe server trả về (cho các client còn lại, trừ client vừa gửi tạo group)
+    // bản chất "data" đây chính là object đã được emit từ client, nên tồn tại 2 phần từ là groupData và memberList
     socket.on("send-back-data-group-chat", function(data) {
-        // console.log(data)
+        // console.log(data.memberList);
+        // console.log(data.groupData);
         var currentUser = $('#currentUserId').val();
         // hiển thị group mới tạo lên leftSide
-        letSubStringGroupName = data.name; // kiểm tra độ dài của tên group, nếu quá 15 thì ẩn bớt
+        letSubStringGroupName = data.groupData.name; // kiểm tra độ dài của tên group, nếu quá 15 thì ẩn bớt
         if (letSubStringGroupName.length > 15) {
             letSubStringGroupName = letSubStringGroupName.substring(0, 14) + '<span>...</span>';
         };
 
         let leftSide = `
-            <a href="#uid_${data._id}" class="room-chat" id="null-contact" data-target="#to_${data._id}">
-                <li class="person" data-chat="${data._id}">
+            <a href="#uid_${data.groupData._id}" class="room-chat" id="null-contact" data-target="#to_${data.groupData._id}">
+                <li class="person" data-chat="${data.groupData._id}">
                     <div class="left-avatar">
                         <div class="dot online"></div>
-                        <img src="${data.image_path}" alt="">
+                        <img src="${data.groupData.image_path}" alt="">
                     </div>
 
                     <span class="name">
@@ -228,7 +273,7 @@ $(document).ready(function() {
             </a>`;
         
         // Hiển thị ra danh sách chat bên leftSide
-        data.members.forEach(function(member_item, index) {
+        data.groupData.members.forEach(function(member_item, index) {
             // nếu id của người nhận bằng id người đang đăng nhập thì mới đẩy dữ liệu lên (id của người dùng ở client khác)
             if (member_item == currentUser) {
                 $('#all-chat').find('ul.group').prepend(leftSide);
@@ -238,34 +283,34 @@ $(document).ready(function() {
 
         // Đổ ra khung chat bên rightSide
         let rightSideData = `
-            <div class="right tab-pane" data-chat="${data._id}" id="to_${data._id}">
+            <div class="right tab-pane" data-chat="${data.groupData._id}" id="to_${data.groupData._id}">
                 <div class="top">
-                    <span>To: <span class="name">${data.name}</span></span>
+                    <span>To: <span class="name">${data.groupData.name}</span></span>
                     <span class="chat-menu-right">
-                        <a href="#memberGroup_${data._id}" data-toggle="modal" data-target="#memberGroup_${data._id}">
-                            Members &nbsp;
+                        <a href="#memberGroup_${data.groupData._id}" data-toggle="modal" data-target="#memberGroup_${data.groupData._id}">
+                            Members (${data.groupData.members.length}) &nbsp;
                             <i class="fa fa-users"></i>
                         </a>
                     </span>
                 </div>
                 
                 <div class="content-chat">
-                    <div class="chat" data-chat="${data._id}"></div>
+                    <div class="chat" data-chat="${data.groupData._id}"></div>
                 </div>
                 
-                <div class="write" data-chat="${data._id}">
-                    <input type="text" class="write-chat chat-in-group" id="write-chat-${data._id}" data-chat="${data._id}">
+                <div class="write" data-chat="${data.groupData._id}">
+                    <input type="text" class="write-chat chat-in-group" id="write-chat-${data.groupData._id}" data-chat="${data.groupData._id}">
                     <div class="icons">
-                        <a href="#" class="icon-chat" data-chat="${data._id}"><i class="fa fa-smile-o"></i></a>
+                        <a href="#" class="icon-chat" data-chat="${data.groupData._id}"><i class="fa fa-smile-o"></i></a>
                         <!-- <label for="image-chat">
-                            <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data._id}">
+                            <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data.groupData._id}">
                             <i class="fa fa-photo"></i>
                         </label>
                         <label for="attach-chat">
-                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data._id}">
+                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data.groupData._id}">
                             <i class="fa fa-paperclip"></i>
                         </label>
-                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data._id}" data-toggle="modal">
+                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data.groupData._id}" data-toggle="modal">
                             <i class="fa fa-video-camera"></i>
                         </a> -->
                         <input type="hidden" id="peer-id" value="">
@@ -274,12 +319,60 @@ $(document).ready(function() {
             </div>
         `;
 
-        data.members.forEach(function(member_item, index) {
+        data.groupData.members.forEach(function(member_item, index) {
             // nếu id của người nhận bằng id người đang đăng nhập thì mới đẩy dữ liệu lên (id của người dùng ở client khác)
             if (member_item == currentUser) {
+                // đẩy bảng chat của group mới lên html
                 $('#screen_chat').prepend(rightSideData);
             }
-        })
+        });
+
+        // tạo modal chứa member của group mới tạo
+        let memberListOfNewGroup = `
+            <div class="modal fade" id="memberGroup_${data.groupData._id}" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Members list: <span class="group-chat-name">${data.groupData.name}</span></h4>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="list-members"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        // đẩy lên html danh sách member của group mới tạo
+        data.groupData.members.forEach(function(member_item, index) {
+            // nếu id của người nhận bằng id người đang đăng nhập thì mới đẩy dữ liệu lên (id của người dùng ở client khác)
+            if (member_item == currentUser) {
+                $('.content').append(memberListOfNewGroup); // đẩy khung modal lên
+                for(const memberList_item of data.memberList){ // đẩy list member lên modal
+                    $(`.content div#memberGroup_${data.groupData._id} .modal-content .modal-body .list-members`).append(
+                        `<div data-uid="${memberList_item._id}">
+                            <li data-uid="${memberList_item._id}">
+                                <div class="contactPanel">
+                                    <div class="row"></div>
+                                    <div class="user-avatar">
+                                        <img src="${memberList_item.image_path}" alt="">
+                                    </div>
+                                    <div class="user-name">
+                                        <p>
+                                            &nbsp ${memberList_item.info.firstname} ${memberList_item.info.lastname}
+                                        </p>
+                                    </div>
+                                    <br>
+                                    <div class="user-address">
+                                        &nbsp ${memberList_item.local.email}
+                                    </div>
+                                </div>
+                            </li>
+                        </div>`
+                    );
+                };
+            }
+        });
 
         // gọi lại hàm changeScreenChat để thay đổi màn hình chat
         changeScreenChat();
