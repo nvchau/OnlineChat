@@ -13,6 +13,8 @@ var flash = require('connect-flash');
 var validator = require('express-validator');
 var cors = require('cors');
 
+const csrf = require('csurf');
+
 // moment dùng để convert timestamp thành human time
 var moment = require('moment');
 

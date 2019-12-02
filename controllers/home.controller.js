@@ -1,8 +1,9 @@
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-
-var Member = require('../models/member');
+const fs = require('fs');
+const Helper = require('../helper/helper');
+const Member = require('../models/member');
 
 exports.index = (req, res, next) => {
     res.render('frontend/home/index', {
@@ -32,8 +33,8 @@ exports.postLogin = (req, res) => {
     })
     .then(user => {
         if (!user) {
-        req.flash('error', 'Invalid email.');
-        return res.redirect('/login');
+            req.flash('error', 'Invalid email.');
+            return res.redirect('/login');
         }
         bcrypt
         .compare(password, user.local.password)
@@ -41,9 +42,10 @@ exports.postLogin = (req, res) => {
             if (doMatch) {
                 req.session.isLoggedIn = true;
                 req.session.user = user;
-                // tự động đăng nhập sau khi đăng ký
+                
                 return req.session.save(err => {
                     if (err) console.log(err);
+                    req.flash('messagesWelcome', 'Hello '+ user.info.firstname +' '+ user.info.lastname);
                     res.redirect('/chatapp');
                 });
             }
@@ -99,28 +101,28 @@ exports.postRegister = (req, res) => {
         }
         return bcrypt.hash(password, 5)
         .then(hashedPassword => {
-        var newMember = new Member();
-        newMember.info.firstname = firtname;
-        newMember.info.lastname = lastname;
-        newMember.local.email = email;
-        newMember.local.password = hashedPassword;
-        newMember.image_path = 'images/avatar/avatar-user.png';
-        newMember.roles = 'MEMBER';
-        newMember.status = 'ACTIVE';
+            var newMember = new Member();
+            newMember.info.firstname = firtname;
+            newMember.info.lastname = lastname;
+            newMember.local.email = email;
+            newMember.local.password = hashedPassword;
+            newMember.image_path = 'images/avatar/avatar-user.png';
+            newMember.roles = 'MEMBER';
+            newMember.status = 'ACTIVE';
 
-        newMember.save(function(err, user) {
-            if (err) {
-                console.log(err);
-            } else {
-                // Tự động đăng nhập cho thành viên mới đăng ký
-                req.session.isLoggedIn = true;
-                req.session.user = user;
-                return req.session.save(err => {
-                    if (err) console.log(err);
-                    res.redirect('/chatapp');
-                });
-            }
-        });
+            newMember.save(function(err, user) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    // Tự động đăng nhập cho thành viên mới đăng ký
+                    req.session.isLoggedIn = true;
+                    req.session.user = user;
+                    return req.session.save(err => {
+                        if (err) console.log(err);
+                        res.redirect('/chatapp');
+                    });
+                }
+            });
         })
     })
     .catch(err => {
@@ -128,9 +130,102 @@ exports.postRegister = (req, res) => {
     });
 }
 
-exports.profile = (req, res, next) => {
+exports.getProfile = (req, res, next) => {
     res.render('frontend/home/profile', {
         pageTitle: 'WebChat/Profile',
+    })
+    .catch(err => console.log(err));
+}
+
+exports.postEditProfile = (req, res, next) => {
+    let currentUserId = req.session.user._id;
+
+    console.log(req.file);
+
+    var firstname = req.body.firstname !== null ? req.body.firstname : user.info.firstname;
+    var lastname = req.body.lastname !== null ? req.body.lastname : user.info.lastname;
+
+    Member.findOne({_id: currentUserId}).then(user => {
+        // kiểm tra đổi ảnh không
+        if (req.file === undefined) {
+            user.info.firstname = firstname;
+            user.info.lastname = lastname;
+
+            req.flash('messageEditProfile', 'Save changes successfullys');
+            user.save().then(() => res.redirect('/chatapp'));
+        } else {
+            // xóa file ảnh cũ nếu đổi ảnh
+            // let path = user.image_path.split('/');
+            // let filePath = './public/uploads/avatar-user/' + path[path.length - 1];
+            // fs.unlinkSync(filePath, (err) => {
+            //     if (err) console.log("Couldn't delete image: " + user.image_path);
+            // });
+
+            user.image_path = '/uploads/avatar-user/' + req.file.filename;
+            user.info.firstname = firstname;
+            user.info.lastname = lastname;
+
+            user.save().then(() => {
+                req.flash('messageEditProfile', 'Save changes successfullys');
+                res.redirect('/chatapp');
+            });
+        }
+    }).catch(err => console.log(err));
+}
+
+exports.getChangePassword = (req, res, next) => {
+    let messages = req.flash('error');
+    if (messages.length > 0) {
+        messages = messages[0];
+    } else {
+        messages = null;
+    }
+    res.render('frontend/home/changepassword', {
+        pageTitle: 'WebChat/Change Password',
+        errorMessage: messages,
+    })
+    .catch(err => console.log(err));
+}
+
+exports.postChangePassword = (req, res, next) => {
+    let currentUserId = req.session.user._id;
+
+    var curent_password = req.body.curent_password;
+    var new_password = req.body.new_password;
+    var comfirm_password = req.body.comfirm_password;
+
+    Member.findOne({_id: currentUserId}).then(user => {
+        bcrypt
+        .compare(curent_password, user.local.password)
+        .then(doMatch => {
+            if (doMatch) {
+                req.session.isLoggedIn = true;
+                req.session.user = user;
+                req.session.save();
+                if (new_password === comfirm_password) {
+                    bcrypt.hash(new_password, 5)
+                    .then(hashedPassword => {
+                        user.local.password = hashedPassword;
+                        user.save();
+                        return req.session.save(err => {
+                            if (err) console.log(err);
+                            req.flash('messagesChangepassword', 'Change password successfully');
+                            res.redirect('/chatapp');
+                        });
+                    })
+                } else {
+                    req.flash('error', 'Invalid comfirm password.');
+                    res.redirect('back');
+                }
+            } else {
+                req.flash('error', 'Invalid current password.');
+                res.redirect('back');
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.redirect('back');
+        });
     })
     .catch(err => console.log(err));
 }

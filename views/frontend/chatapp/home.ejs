@@ -9,7 +9,7 @@
 </head>
 <body>
     <% include ../../layouts/navbar %>
-
+    
     <div class="container-fluid">
         <div class="row content">
             <!-- left -->
@@ -25,12 +25,20 @@
     </div>
 
     <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
-    <input type="hidden" name="currentUser" id="currentUser" value="<%= user.info.firstname %> <%= user.info.lastname %>">
+    <% if (messagesWelcome) {%>
+        <input type="hidden" name="messages" id="messages" value="<%= messagesWelcome %>">
+    <% } else if (messagesChangepassword) { %>
+        <input type="hidden" name="messages" id="messages" value="<%= messagesChangepassword %>">
+    <% } else if (messageEditProfile) { %>
+        <input type="hidden" name="messages" id="messages" value="<%= messageEditProfile %>">
+    <% } %>
 
     <% include ../../layouts/script %>
 </body>
     <script>
-        var currentUser = $('#currentUser').val();
-        alertify.success(`<h5>Hello, ${currentUser}</h5>`);
+        var messages = $('#messages').val();
+        if (messages) {
+            alertify.success(messages);
+        }
     </script>
 </html>

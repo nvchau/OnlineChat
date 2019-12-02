@@ -6,15 +6,39 @@ var Messages  = require('../models/messages');
 
 exports.home = (req, res, next) => {
     // console.log(req.session.user._id)
+    let messagesWelcome = req.flash('messagesWelcome'); // message nhận từ flash của login
+    if (messagesWelcome.length > 0) {
+        messagesWelcome = messagesWelcome[0];
+    } else {
+        messagesWelcome = null;
+    }
+
+    let messagesChangepassword = req.flash('messagesChangepassword'); //message nhận từ flash của changepassword
+    if (messagesChangepassword.length > 0) {
+        messagesChangepassword = messagesChangepassword[0];
+    } else {
+        messagesChangepassword = null;
+    }
+
+    let messageEditProfile = req.flash('messageEditProfile'); //message nhận từ flash của edit profile
+    console.log(messageEditProfile);
+    if (messageEditProfile.length > 0) {
+        messageEditProfile = messageEditProfile[0];
+    } else {
+        messageEditProfile = null;
+    }
     
     Member.find().then(member => { //{ _id: req.session.user._id }
         Group.find().then(group => {
-            Messages.find().sort({createdAt: 1}).then(messages => { //.sort({createdAt: 1}): sắp xếp theo thời gian
+            Messages.find().sort({createdAt: 1}).then(messages => { //.sort({createdAt: 1}): sắp xếp theo thời gian giản dần
                 res.render('frontend/chatapp/home', {
                     pageTitle: 'WebChat',
                     member   : member,
                     group    : group,
-                    messages : messages
+                    messages : messages,
+                    messagesWelcome : messagesWelcome,
+                    messagesChangepassword : messagesChangepassword,
+                    messageEditProfile : messageEditProfile
                 })
             })
         })
