@@ -21,10 +21,14 @@
             <% include modals/createGroupChat %>
             <!-- modal danh sách thành viên group -->
             <% include modals/memberOfGroup %>
+            <!-- modal profile -->
+            <% include modals/editProfile %>
         </div>
     </div>
 
     <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
+    <input type="hidden" name="currentUserName" id="currentUserName" value="<%= user.info.firstname %> <%= user.info.lastname %>">
+
     <% if (messagesWelcome) {%>
         <input type="hidden" name="messages" id="messages" value="<%= messagesWelcome %>">
     <% } else if (messagesChangepassword) { %>

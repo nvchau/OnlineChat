@@ -7,9 +7,9 @@ function textAndEmojiChat(divId) {
             // lấy dữ liệu trong thẻ input
             let messagaVal = $(`#write-chat-${divId}`).val();
 
-            // nếu ô input trống hoặc chỉ chứa ký tự khoảng trắng thì không trả về
+            // nếu ô input trống hoặc chỉ chứa ký tự khoảng trắng thì không thực thi gửi sự kiện
             if (!targetId.replace(/\s/g, '').length || !messagaVal.replace(/\s/g, '').length) {
-                alertify.error('Messages is empty!');
+                // alertify.error('Messages is empty!');
                 return false;
             }
 
@@ -75,7 +75,7 @@ function textAndEmojiChat(divId) {
 }
 
 $(document).ready(function () {
-    // lắng nghe server trả về tin nhắn
+    // LẮNG NGHE SERVER TRẢ TIN NHẮN VỀ
     socket.on("send-back-data-chat", function (data) {  
         let divId = '';
         
@@ -107,5 +107,31 @@ $(document).ready(function () {
             }
         }
 
+    })
+
+    // LẮNG NGHE SERVER TRẢ SỰ KIỆN ĐANG NHẬP TIN NHẮN
+    // đang nhập tin nhắn
+    socket.on("server-send-back-typing", function(typingData) {
+        var currentUserId = $('#currentUserId').val();
+        // đối vớ group - gửi thằng đến rightside của cuộc trò chuyện
+        let typing = `<img src="images/icon/typing.gif" title="${typingData.senderName}">`;
+        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).html('');
+        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).append(typing);
+        // đối với personal
+        if (typingData.receiverId == currentUserId) {
+            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).html('');
+            // phía client khác sẽ dựa vào senderId bằng với id cuộc trò chuyện họ trỏ tới để nhận sự kiện
+            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).append(typing);
+        }
+    })
+    // ngừng nhập tin nhắn
+    socket.on("server-send-back-stop-typing", function(typingData) {
+        // đối với group
+        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).html('');
+        // đối với personal
+        var currentUserId = $('#currentUserId').val();
+        if (typingData.receiverId == currentUserId) {
+            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).html('');
+        }
     })
 })

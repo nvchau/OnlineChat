@@ -34,13 +34,30 @@ function enableEmojioneArea(divId) {
     search: false,
     shortnames: false,
     events: {
-      keyup: function(editor, event) {
+      keyup: function(editor, event) { 
         // gán giá trị thay đổi vào vài thẻ input đã bị ẩn
+        // lắng nghe và gán emoji mới nhập vào input nhập tin nhắn theo đúng id
         $(`#write-chat-${divId}`).val(this.getText());
       },
-      click: function() {
+      click: function() { // lắng nghe click button mở emoji
         // bật lắng nghe DOM cho việc chat tin nhắn văn bản + emoji
         textAndEmojiChat(divId); // hàm này bên file textAndEmojiChat.js
+
+        // ==============================================================
+        // BẮT SỰ KIỆN CLIENT ĐANG NHẬP TIN NHẮN| lúc click vào input
+        var currentUserId = $('#currentUserId').val();
+        var currentUserName = $('#currentUserName').val();
+        var typingData = {
+          senderId: currentUserId,
+          senderName: currentUserName, // người đang nhập
+          receiverId: divId // đối tượng đang được nhập
+        }
+        socket.emit("client-is-typing", typingData); // gửi sự kiện lên server
+        // bắt sự kiện client ngừng nhập
+        $(`#write-chat-${divId}`).focusout(function(){ // ngừng trỏ vào input
+            socket.emit("client-stop-typing", typingData);
+        });
+        // ==============================================================
       }
     },
   });
@@ -121,7 +138,7 @@ function configNotification() {
 //   });
 // }
 
-// thay đổi kiểu chat
+// thay đổi kiểu chat (trong select ở leftside)
 function changeTypeChat(){
   $('#select-type-chat').bind('change', function(){
     let optionSelected = $('option:selected', this);

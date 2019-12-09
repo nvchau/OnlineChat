@@ -44,6 +44,15 @@ io.on("connection", function(socket) {
         // console.log(data.groupChat);
         socket.broadcast.emit("send-back-data-group-chat", data);
     })
+
+    // lắng nghe sự kiện client đang nhập tin nhắn
+    socket.on("client-is-typing", function(typingData) {
+        socket.broadcast.emit("server-send-back-typing", typingData);
+    })
+    // lắng nghe sự kiện client ngừng nhập tin nhắn
+    socket.on("client-stop-typing", function(typingData) {
+        socket.broadcast.emit("server-send-back-stop-typing", typingData);
+    })
 });
 // ===============================================================
 // ===============================================================
