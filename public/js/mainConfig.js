@@ -169,6 +169,9 @@ function changeScreenChat(){
 
     // Bật emoji, tham số truyền vào là id của box nhập nội dung tin nhắn
     enableEmojioneArea(divId); // mỗi lần click sẽ thay đổi màn hình chat 1 lần, tương tự sẽ gọi lại hàm 1 lần
+
+    // Bật lắng nghe DOM cho video-chat
+    videoChat(divId);
   });
 }
 

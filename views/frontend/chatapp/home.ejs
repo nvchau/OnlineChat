@@ -23,6 +23,7 @@
             <% include modals/memberOfGroup %>
             <!-- modal profile -->
             <% include modals/editProfile %>
+
         </div>
     </div>
 
@@ -44,5 +45,21 @@
         if (messages) {
             alertify.success(messages);
         }
+
+        // gửi id người vừa đăng nhập lên server để cập nhật danh sách online
+        var currentId = $('#currentUserId').val();
+        if (currentId) {
+            socket.emit("client-login", currentId);
+        }
+
+        $(document).ready(function() {
+            // gửi sự kiện login lên server || mỗi lần có client logout, sẽ tự động cập nhật ở đây, vì dùng chung tên sự kiện (list-clients-online)
+            socket.on("list-clients-online", function(clients) {
+                $(`.left ul.people li .left-avatar .dot`).removeClass("online");
+                for (var clientId of clients) {
+                    $(`.left ul.people li[data-chat=${clientId}] .left-avatar .dot`).addClass("online");
+                }
+            })
+        })
     </script>
 </html>

@@ -81,11 +81,11 @@
                         <label for="attach-chat">
                             <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="<%= member_item._id %>">
                             <i class="fa fa-paperclip"></i>
-                        </label>
-                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= member_item._id %>" data-toggle="modal">
+                        </label> -->
+                        <a href="javascript:void(0)" id="video-chat-<%= member_item._id %>" 
+                        class="video-chat" data-chat="<%= member_item._id %>">
                             <i class="fa fa-video-camera"></i>
-                        </a> -->
-                        <input type="hidden" id="peer-id" value="">
+                        </a>
                     </div>
                 </div>
             
@@ -153,7 +153,6 @@
                         <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal">
                             <i class="fa fa-video-camera"></i>
                         </a> -->
-                        <input type="hidden" id="peer-id" value="">
                     </div>
                 </div>
             
