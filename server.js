@@ -3,6 +3,8 @@
 /**
  * Module dependencies.
  */
+const EventEmitter = require('events'); // giới hạn lắng nghe (on) của một module node là 11, import events để tăng giới hạn
+EventEmitter.defaultMaxListeners = 100; // tăng giới giạn lắng nghe lên 30 (bao nhiêu cũng được)
 
 var app = require('./app');
 var debug = require('debug')('classield:server');
@@ -30,13 +32,12 @@ let clients = [];
 // lắng nghe client kết nối
 io.on("connection", function(socket) {
     console.log('Have user connected: '+socket.id);
+    // =========== CHECK TRẠNG THÁI ONLINE-OFFLINE CỦA CLIENTS ============
     // lắng nghe mỗi khi đăng nhập client sẽ gửi id lên
     socket.on("client-login", function(clientId) {
-        if (!clients[clientId]){
-            clients.push(clientId);
-            // khởi tạo clientId bằng id của client vừa gửi lên
-            socket.clientId = clientId;
-        }
+        clients.push(clientId);
+        // khởi tạo clientId bằng id của client vừa gửi lên
+        socket.clientId = clientId;
         // loại bỏ phần tử trùng lặp
         // var listClients = [...clients.reduce((p,c) => p.set(c,true),new Map()).keys()];
         // gửi mảng chứa danh sách online đến các client còn lại
@@ -44,6 +45,7 @@ io.on("connection", function(socket) {
         // ============== CLIENT NGẮT KẾT NỐI ================
         socket.on("disconnect", function(){
             console.log(socket.id + " -> Disconnected!");
+            // loại bỏ id của client vừa logout khỏi mảng online
             var clientLogOut = clients.indexOf(socket.clientId);
             if (clientLogOut != -1) {
                 clients.splice(clientLogOut, 1);
@@ -51,6 +53,146 @@ io.on("connection", function(socket) {
             // gửi lại mảng danh sách online cho client sau khi cập nhật
             io.sockets.emit("list-clients-online", clients); 
         });
+
+        // =============== VIDEO CHAT ================
+        // lắng nghe người gọi kiểm tra xem người nghe có online không
+        socket.on("caller-check-listener-online-or-not", function(data) {
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            // nếu tồn tại Id của người nghe thì người đó đang online
+            if (clientsObj[data.listenerId]){ // online
+                let response = {
+                    callerId: data.callerId,
+                    listenerId: data.listenerId,
+                    callerName: data.callerName
+                };
+                // console.log(response)
+                // server gửi request yêu cầu lấy peerId của người nghe
+                socket.broadcast.emit("server-request-peer-id-of-listener", response);
+            } else { // offline
+                socket.emit("listener-is-offline")
+            }
+        });
+
+        // Lắng nghe client (người nghe) gửi data kèm peerId lên
+        socket.on("listener-emit-peer-id-to-server", function(data) {
+            // console.log(data)
+            let response = {
+                callerId: data.callerId,
+                listenerId: data.listenerId,
+                callerName: data.callerName,
+                listenerName: data.listenerName,
+                listenerPeerId: data.listenerPeerId
+            };
+            
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            
+            if (clientsObj[data.callerId]) { // kiểm tra người gọi, để người nghe gửi trả peerId
+                // server gửi response kèm peerId của người nghe cho người gọi
+                socket.broadcast.emit("server-send-peerId-of-listener-to-caller", response);
+            }
+        });
+
+        // lắng nghe yêu cầu gọi của người gọi (caller)
+        socket.on("caller-request-call-to-server", function(data) {
+            let response = {
+                callerId: data.callerId,
+                listenerId: data.listenerId,
+                callerName: data.callerName,
+                listenerName: data.listenerName,
+                listenerPeerId: data.listenerPeerId
+            };
+            
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            
+            if (clientsObj[data.listenerId]) { // kiểm tra người nghe, để người nghe biết được có người gọi
+                // gửi response kèm yêu cầu gọi của người gọi tới người nghe
+                socket.broadcast.emit("server-send-request-call-to-listener", response);
+            }
+        });
+
+        // Lắng nghe người gọi (caller) hủy yêu cầu gọi
+        socket.on("caller-cancel-request-call-to-server", function(data) {
+            let response = {
+                callerId: data.callerId,
+                listenerId: data.listenerId,
+                callerName: data.callerName,
+                listenerName: data.listenerName,
+                listenerPeerId: data.listenerPeerId
+            };
+            
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            
+            if (clientsObj[data.listenerId]) { // kiểm tra người nghe, để người nghe biết được người gọi đã hủy
+                // gửi response kèm yêu cầu hủy cuộc gọi của người gọi tới người nghe
+                socket.broadcast.emit("server-send-cancel-request-call-to-listener", response);
+            }
+        });
+
+        // lắng nghe người nghe (listener) từ chối cuộc gọi
+        socket.on("listener-reject-request-call-to-server", function(data) {
+            let response = {
+                callerId: data.callerId,
+                listenerId: data.listenerId,
+                callerName: data.callerName,
+                listenerName: data.listenerName,
+                listenerPeerId: data.listenerPeerId
+            };
+            
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            
+            if (clientsObj[data.callerId]) { // kiểm tra người gọi, để người gọi biết được người nghe đã từ chối
+                // gửi response kèm yêu cầu hủy cuộc gọi của người nghe tới người gọi
+                socket.broadcast.emit("server-send-reject-call-to-caller", response);
+            }
+        });
+
+        // lắng nghe người nghe chấp nhận cuộc gọi
+        socket.on("listener-accept-request-call-to-server", function(data) {
+            let response = {
+                callerId: data.callerId,
+                listenerId: data.listenerId,
+                callerName: data.callerName,
+                listenerName: data.listenerName,
+                listenerPeerId: data.listenerPeerId
+            };
+            
+            // chuyển mảng clients thành object
+            let clientsObj = clients.reduce(function(o, val) { 
+                o[val] = val;
+                return o; 
+            }, {});
+            
+            if (clientsObj[data.callerId]) { // kiểm tra người gọi, để người gọi biết được người nghe đã chấp nhận
+                // gửi response kèm chấp nhận cuộc gọi của người nghe tới người gọi
+                io.sockets.emit("server-send-accept-call-to-caller", response);
+            }
+            if (clientsObj[data.listenerId]) {
+                // khi chấp nhận cuộc gọi, cả người nghe và người gọi đều sẽ mở cuộc gọi, nên sẽ gửi dữ liệu đến cả 2
+                io.sockets.emit("server-send-accept-call-to-listener", response);
+            }
+
+        });
+        // ============= KẾT THÚC VIDEO CHAT ====================
     })
 
     // console.log(socket.adapter.rooms); // show ra tất cả các room đang có
@@ -79,11 +221,6 @@ io.on("connection", function(socket) {
         socket.broadcast.emit("server-send-back-stop-typing", typingData);
     })
 
-    // =============== VIDEO CHAT ================
-    // lắng nghe người gọi kiểm tra xem người nghe có online không
-    socket.on("caller-check-listener-online", function(data) {
-
-    })
 });
 // ===============================================================
 // ===============================================================
