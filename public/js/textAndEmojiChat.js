@@ -43,6 +43,7 @@ function textAndEmojiChat(divId) {
                 // let convertEmojiMessage = emojione.toImage(messageOfMe.html());
                 let convertEmojiMessage = messageOfMe.html();
 
+                // đẩy tin nhắn mới gửi lên phía người gửi
                 if (dataTextEmojiForSend.isChatGroup){
                     let senderAvatar = `<img src="${data.message.sender.avatar}" class="avatar-small" title="${data.message.sender.name}" alt="${data.message.sender.name}">`;
                     let sendTime = `<span class="time-chat">${ moment(data.message.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY') }</span>`;
@@ -57,6 +58,12 @@ function textAndEmojiChat(divId) {
 
                 // step 02: append message data to screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfMe);
+
+                // cập nhật tin nhắn mới nhất lên preview
+                $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
+                // cập thời gian của tin nhắn mới nhất lên preview
+                $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
+
                 nineScrollRight(divId); // gọi lại hàm để cuộn đến tin nhắn cuối
 
                 // step 03: remove all data in input
@@ -83,6 +90,7 @@ $(document).ready(function () {
         messageOfYou.text(data.message.text);
         let convertEmojiMessage = messageOfYou.html();
 
+        // đẩy tin nhắn mới gửi lên phía người nhận
         if (data.groupId){
             let senderAvatar = `<img src="${data.message.sender.avatar}" class="avatar-small" title="${data.message.sender.name}" alt="${data.message.sender.name}">`;
             let sendTime = `<span class="time-chat">${ moment(data.message.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY') }</span>`;
@@ -92,7 +100,7 @@ $(document).ready(function () {
             $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
             nineScrollRight(divId);
         } 
-        
+        // đẩy tin nhắn mới gửi lên phía người nhận
         if (data.personalId) {
             let sendTime = `<span class="time-chat">${ moment(data.message.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY') }</span>`;
             messageOfYou.html(`${convertEmojiMessage}<br>${sendTime}`);
@@ -102,11 +110,16 @@ $(document).ready(function () {
             // nếu id của người nhận bằng id người đang đăng nhập thì mới hiển thị tn (id của người dùng ở client khác)
             var currentUser = $('#currentUserId').val();
             if (data.personalId == currentUser){
+                // đẩy tin nhắn mới lên screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
                 nineScrollRight(divId);
+
+                // cập nhật tin nhắn mới nhất lên preview
+                $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
+                // cập thời gian của tin nhắn mới nhất lên preview
+                $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
             }
         }
-
     })
 
     // LẮNG NGHE SERVER TRẢ SỰ KIỆN ĐANG NHẬP TIN NHẮN

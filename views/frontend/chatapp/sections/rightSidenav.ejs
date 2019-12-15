@@ -45,12 +45,14 @@
                                 || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
                                     <!-- kiểu text -->
                                     <% if (message_item.messageType === 'text') { %>
-                                        <div class="bubble
+                                        <div id="last_mess" class="bubble
                                             <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>"
                                             data-mess-id="<%= message_item._id %>">
                                             <!-- <img class="avatar-small" src="<%= message_item.sender.avatar %>" title="<%= message_item.sender.name %>" alt="<%= message_item.sender.avatar %>"> -->
-                                            <%= message_item.text %>
+                                            <span id="text-chat"><%= message_item.text %></span>
+                                            <span id="time-chat-to-get" style="display: none;"><%= message_item.createdAt %></span>
+                                            <span id="member-id-chat" style="display: none;"><%= member_item._id %></span>
                                             <br>
                                             <span class="time-chat"><%= moment(message_item.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY'); %></span>
                                         </div>

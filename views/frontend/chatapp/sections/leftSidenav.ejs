@@ -29,44 +29,10 @@
                                             <%= member_item.info.firstname %> <%= member_item.info.lastname %>
                                         <% } %>
                                     </span><br>
-                                    <span class="time"></span>
-                                    <span class="preview"></span>
-
                                     <!-- hiển thị thời gian của tin nhắn cuối cùng -->
-                                    <!-- <span class="time">
-                                        <% messages.forEach(function(message_item, index){ %>
-                                            <% if (message_item.conversationType === 'personal') { %>
-                                                <% if ((member_item._id.toString() === message_item.receiverId && user._id.toString() === message_item.senderId)
-                                                || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
-                                                    <% if (message_item.messageType === 'text') { %>
-                                                        <% if (index === messages.length - 1) { %>
-                                                            
-                                                            <%= moment(message_item.createdAt).locale("vi").fromNow(); %>
-                                                            
-                                                        <% } %>
-                                                    <% } %>
-                                                <% } %>
-                                            <% } %>
-                                        <% }); %>
-                                    </span> -->
-
+                                    <span class="time"></span>
                                     <!-- hiển thị tin nhắn cuối cùng -->
-                                    <!-- <span class="preview">
-                                        <% messages.forEach(function(message_item, index){ %>
-                                            <% if (message_item.conversationType === 'personal') { %>
-                                                <% if ((member_item._id.toString() === message_item.receiverId && user._id.toString() === message_item.senderId)
-                                                || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
-                                                    <% if (message_item.messageType === 'text') { %>
-                                                        <% if (index === messages.length - 1) { %>
-                                                            
-                                                            <%= message_item.text.substring(0, 20) %>...
-                                                            
-                                                        <% } %>
-                                                    <% } %>
-                                                <% } %>
-                                            <% } %>
-                                        <% }); %>
-                                    </span> -->
+                                    <span class="preview"></span>
                                 </li>
                             </a>
                         <% } %>
@@ -95,38 +61,6 @@
                                         </span>
                                         <span class="time"></span>
                                         <span class="preview"></span>
-                                        
-                                        <!-- <span class="time">
-                                            <% messages.forEach(function(message_item, index){ %>
-                                                <% if (message_item.conversationType === 'group') { %>
-                                                    <% if (group_item._id.toString() === message_item.receiverId) { %>
-                                                        <% if (message_item.messageType === 'text') { %>
-                                                            <% if (index === messages.length - 1) { %>
-                                                                
-                                                                <%= moment(message_item.createdAt).locale("vi").fromNow(); %>
-                                                                
-                                                            <% } %>
-                                                        <% } %>
-                                                    <% } %>
-                                                <% } %>
-                                            <% }); %>
-                                        </span> -->
-
-                                        <!-- <span class="preview">
-                                            <% messages.forEach(function(message_item, index){ %>
-                                                <% if (message_item.conversationType === 'group') { %>
-                                                    <% if (group_item._id.toString() === message_item.receiverId) { %>
-                                                        <% if (message_item.messageType === 'text') { %>
-                                                            <% if (index === messages.length - 1) { %>
-                                                            
-                                                                <%= message_item.text.substring(0, 20) %>...
-                                                                
-                                                            <% } %>
-                                                        <% } %>
-                                                    <% } %>
-                                                <% } %>
-                                            <% }); %>
-                                        </span> -->
                                     </li>
                                 </a>
                             <% } %>

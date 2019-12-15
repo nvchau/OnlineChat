@@ -21,7 +21,6 @@ exports.home = (req, res, next) => {
     }
 
     let messageEditProfile = req.flash('messageEditProfile'); //message nhận từ flash của edit profile
-    console.log(messageEditProfile);
     if (messageEditProfile.length > 0) {
         messageEditProfile = messageEditProfile[0];
     } else {
