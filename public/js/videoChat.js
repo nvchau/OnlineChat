@@ -11,27 +11,47 @@ function videoChat(duvId) {
             callerName: callerName // tên người gọi
         }
 
-        // Bước 1: kiểm tra người nghe có online không (của người gọi)
+        // Bước 1 (của người gọi): kiểm tra người nghe có online không 
         socket.emit("caller-check-listener-online-or-not", dataToEmit);
     })
 }
 
 $(document).ready(function() {
-    // Bước 2: lắng nghe server trả về trạng thái của listener offline (của người gọi)
+    // Bước 2 (của người gọi): lắng nghe server trả về trạng thái của listener offline 
     socket.on("listener-is-offline", function(){
         alertify.error("This user is offline.");
     })
     
+    // ==== KHỞI TẠO PEER ====
     let getPeerId = "";
     // mỗi lần reload trang, client sẽ có một peerId khác nhau
     const peer = new Peer(); // tạo mới peer
+    // const peer = new Peer({
+    //     key: "peerjs",
+    //     host: "peerjs-server-nvchaudev.herokuapp.com",
+    //     secure: true,
+    //     port: 443,
+    //     // debug: 3
+    // });
     // console.log(peer);
     peer.on("open", function(peerId) { // lắng nghe sự kiện khởi tạo peer để trả về peerId
         // console.log(peerId);
         getPeerId = peerId;
-        
     })
-    // Bước 3: lắng nghe server trả response và yêu cầu lấy peerId của người nghe về clients (của người nghe)
+    // hàm mở luồng cho stream
+    function openStream() {
+        const config = { audio: true, video: true };
+        return navigator.mediaDevices.getUserMedia(config);
+    };
+    // hàm chạy stream
+    function playStream(idVideoTag, stream) {
+        const video = document.getElementById(idVideoTag);
+        video.srcObject = stream;
+        video.play();
+    };
+    // ==== END PEER ====
+
+    // Bước 3 (của người nghe): lắng nghe server trả response và yêu cầu lấy peerId của người nghe về clients 
     socket.on("server-request-peer-id-of-listener", function(response) {
         let currentId = $("#currentUserId").val();
         if (response.listenerId == currentId) {
@@ -44,7 +64,7 @@ $(document).ready(function() {
                 listenerPeerId: getPeerId
             };
     
-            // Bước 4: gửi dữ liệu kèm peerId về socket-server (của người nghe)
+            // Bước 4 (của người nghe): gửi dữ liệu kèm peerId về socket-server 
             socket.emit("listener-emit-peer-id-to-server", dataToEmit);
         }
     })
@@ -118,7 +138,51 @@ $(document).ready(function() {
                         Swal.close();
                         clearInterval(timerInterval);
                         if (response.callerId == currentCallerId) {
-                            console.log("Caller ok!");
+                            // ==== THỰC HIỆN STREAM (PEER) PHÍA NGƯỜI GỌI ====
+                            // mở modal video-chat
+                            $('#streamModal').modal({
+                                show: true,
+                                // chống hiện tượng click ra ngoài sẽ mất modal
+                                backdrop: 'static',
+                                keyboard: false
+                            });
+                            // gọi hàm openStream của peerjs để mở luồng cho video-chat
+                            openStream().then(stream => {
+                                // gọi hàm playStream để chạy stream của người gọi
+                                playStream('local-stream', stream); // local-stream: đây là id của thẻ video phía người gọi (trong videoChat.ejs)
+                                const call = peer.call(response.listenerPeerId, stream); // truyền vào peerId của người nghe
+                                // chạy stream của người nghe
+                                call.on('stream', remoteStream => {
+                                    playStream('remote-stream', remoteStream); // remote-stream: đây là id của thẻ video phía người nghe (trong videoChat.ejs)
+                                });
+                                
+                                // lắng nghe sự kiện người nghe dừng cuộc gọi
+                                socket.on("server-send-stop-call-to-caller", function(response) {
+                                    call.close();
+                                    stream.getTracks().forEach(track => track.stop());
+                                    peer.removeAllListeners();
+                                    // peer.destroy();
+                                    // $('#streamModal').modal('hide');
+                                })
+                                // ngắt kết nối stream
+                                $('#streamModal button#btn-end-stream').unbind('click').on('click', function() {
+                                    call.close();
+                                    stream.getTracks().forEach(track => track.stop());
+                                    peer.removeAllListeners();
+                                    // peer.destroy();
+                                    // $('#streamModal').modal('hide');
+                                    // gửi sự kiện dừng cuộc gọi lên server
+                                    socket.emit("caller-send-stop-call-to-server", response);
+                                })
+                                $('#streamModal button.close').unbind('click').on('click', function() {
+                                    call.close();
+                                    stream.getTracks().forEach(track => track.stop());
+                                    peer.removeAllListeners();
+
+                                    socket.emit("caller-send-stop-call-to-server", response);
+                                })
+                            });
+                            // ========== END STREAM ===========
                         };
                         
                     });
@@ -199,7 +263,56 @@ $(document).ready(function() {
                         Swal.close();
                         clearInterval(timerInterval);
                         if (response.listenerId == currentListenerId) {
-                            console.log("Listener ok!");
+                            // ==== THỰC HIỆN STREAM (PEER) PHÍA NGƯỜI NGHE ====
+                            // mở modal video-chat
+                            $('#streamModal').modal({
+                                show: true,
+                                // chống hiện tượng click ra ngoài sẽ mất modal
+                                backdrop: 'static',
+                                keyboard: false
+                            });
+                            // lắng nghe có peer khác gọi đến
+                            peer.on('call', call => {
+                                // mở stream
+                                openStream().then(stream => {
+                                    call.answer(stream); // người nghe trả lời cuộc gọi
+                                    // chạy stream của chính người nghe
+                                    playStream('local-stream', stream);
+                                    // chạy stream của người gọi
+                                    call.on('stream', remoteStream => {
+                                        playStream('remote-stream', remoteStream);
+                                    });
+                                    // người nghe lắng nghe sự kiện dừng cuộc gọi từ người gọi
+                                    socket.on("server-send-stop-call-to-listener", function(response) {
+                                        call.close();
+                                        stream.getTracks().forEach(track => track.stop());
+                                        peer.removeAllListeners();
+                                        // peer.destroy();
+                                        // $('#streamModal').modal('hide');
+
+                                        // ====== ĐANG LÀM Ở ĐÂY - CHƯA THỂ NGẮT CUỘC GỌI ======
+
+                                    })
+                                    // người nghe dừng cuộc gọi
+                                    $('#streamModal button#btn-end-stream').unbind('click').on('click', function() {
+                                        call.close();
+                                        stream.getTracks().forEach(track => track.stop());
+                                        peer.removeAllListeners();
+                                        // peer.destroy();
+                                        // $('#streamModal').modal('hide');
+                                        // gửi sự kiện dừng cuộc gọi lên server
+                                        socket.emit("listener-send-stop-call-to-server", response);
+                                    })
+                                    $('#streamModal button.close').unbind('click').on('click', function() {
+                                        call.close();
+                                        stream.getTracks().forEach(track => track.stop());
+                                        peer.removeAllListeners();
+
+                                        socket.emit("listener-send-stop-call-to-server", response);
+                                    })
+                                });
+                            });
+                            // ==== END STREAM ====
                         };
                         
                     });
