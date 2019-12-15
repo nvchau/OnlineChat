@@ -50,19 +50,23 @@ function textAndEmojiChat(divId) {
                     messageOfMe.html(`${senderAvatar} ${convertEmojiMessage}<br>${sendTime}`);
                     dataToEmit.groupId = targetId;
 
+                    // cập nhật tin nhắn mới nhất lên preview
+                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
+                    // cập thời gian của tin nhắn mới nhất lên preview
+                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
                 } else {
                     let sendTime = `<span class="time-chat">${ moment(data.message.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY') }</span>`;
                     messageOfMe.html(`${convertEmojiMessage}<br>${sendTime}`);
                     dataToEmit.personalId = targetId;
+
+                    // cập nhật tin nhắn mới nhất lên preview
+                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
+                    // cập thời gian của tin nhắn mới nhất lên preview
+                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
                 }
 
                 // step 02: append message data to screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfMe);
-
-                // cập nhật tin nhắn mới nhất lên preview
-                $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
-                // cập thời gian của tin nhắn mới nhất lên preview
-                $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
 
                 nineScrollRight(divId); // gọi lại hàm để cuộn đến tin nhắn cuối
 
@@ -98,7 +102,11 @@ $(document).ready(function () {
             divId = data.groupId;
 
             $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
-            nineScrollRight(divId);
+
+            // cập nhật tin nhắn mới nhất lên preview
+            $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
+            // cập thời gian của tin nhắn mới nhất lên preview
+            $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
         } 
         // đẩy tin nhắn mới gửi lên phía người nhận
         if (data.personalId) {
@@ -112,7 +120,6 @@ $(document).ready(function () {
             if (data.personalId == currentUser){
                 // đẩy tin nhắn mới lên screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
-                nineScrollRight(divId);
 
                 // cập nhật tin nhắn mới nhất lên preview
                 $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
@@ -120,6 +127,8 @@ $(document).ready(function () {
                 $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
             }
         }
+        // gọi lại hàm nineScrollRight để cuộn đến cuối cùng của screen tin nhắn
+        nineScrollRight(divId);
     })
 
     // LẮNG NGHE SERVER TRẢ SỰ KIỆN ĐANG NHẬP TIN NHẮN

@@ -1,9 +1,9 @@
 <div class="col-sm-9 sidenav no-padding">
     <div class="tab-content" id="screen_chat">
         <!-- person -->
-        <!-- <div class="right tab-pane active" data-chat="<%= user._id %>" id="to_<%= user._id %>" style="color: green; text-align: center;">
-            <h3>WELCOME TO WEBCHAT</h3>
-            <h4>Hi <%= user.info.firstname %> <%= user.info.lastname %></h4>
+        <!-- <div class="right tab-pane active" data-chat="<%= user._id %>" id="to_<%= user._id %>" style="color: black; text-align: center;">
+            <h3 style="margin-top: 25%;">WELCOME TO WEBCHAT</h3>
+            <h4>Hello <b style="color: green;"><%= user.info.firstname %> <%= user.info.lastname %></b></h4>
         </div> -->
 
         <!-- chat personal -->
@@ -12,11 +12,6 @@
                 
                 <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
-                    <!-- <span class="chat-menu-right">
-                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= member_item._id %>" data-toggle="modal" title="Video call">
-                            <i class="fa fa-video-camera" style="font-size: 25px;"></i>
-                        </a>
-                    </span> -->
                 </div>
                 <!-- <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
@@ -45,7 +40,7 @@
                                 || (member_item._id.toString() === message_item.senderId && user._id.toString() === message_item.receiverId)) { %>
                                     <!-- kiểu text -->
                                     <% if (message_item.messageType === 'text') { %>
-                                        <div id="last_mess" class="bubble
+                                        <div id="last_mess_personal" class="bubble
                                             <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>"
                                             data-mess-id="<%= message_item._id %>">
@@ -115,12 +110,15 @@
                                 <% if (group_item._id.toString() === message_item.receiverId) { %>
                                     <!-- kiểu text -->
                                     <% if (message_item.messageType === 'text') { %>
-                                        <div class="bubble
+                                        <div id="last_mess_group" class="bubble
                                             <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>"
                                             data-mess-id="<%= message_item._id %>">
                                             <img class="avatar-small" src="<%= message_item.sender.avatar %>" title="<%= message_item.sender.name %>" alt="<%= message_item.sender.avatar %>">
-                                            <%= message_item.text %>
+                                            <span id="text-chat"><%= message_item.text %></span>
+                                            <span id="time-chat-to-get" style="display: none;"><%= message_item.createdAt %></span>
+                                            <span id="member-id-chat" style="display: none;"><%= group_item._id %></span>
+                                            <span id="time-chat-to-get" style="display: none;"><%= message_item.sender.name %></span>
                                             <br>
                                             <span class="time-chat"><%= moment(message_item.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY'); %></span>
                                         </div>
@@ -161,6 +159,4 @@
             </div>
         <% }); %>
     </div>
-
-    <!-- <button id="inputClick" onclick="getValueInput()">Get value input</button> -->
 </div>
