@@ -44,7 +44,7 @@ function enableEmojioneArea(divId) {
         textAndEmojiChat(divId); // hàm này bên file textAndEmojiChat.js
 
         // ==============================================================
-        // BẮT SỰ KIỆN CLIENT ĐANG NHẬP TIN NHẮN| lúc click vào input
+        // BẮT SỰ KIỆN CLIENT ĐANG NHẬP TIN NHẮN (typing)| lúc click vào input
         var currentUserId = $('#currentUserId').val();
         var currentUserName = $('#currentUserName').val();
         var typingData = {
@@ -170,7 +170,10 @@ function changeScreenChat(){
     // Bật emoji, tham số truyền vào là id của box nhập nội dung tin nhắn
     enableEmojioneArea(divId); // mỗi lần click sẽ thay đổi màn hình chat 1 lần, tương tự sẽ gọi lại hàm 1 lần
 
-    // Bật lắng nghe DOM cho video-chat
+    // Lắng nghe DOM cho image-chat | tham số truyền vào là id của box nhập nội dung tin nhắn
+    imageChat(divId);
+
+    // Lắng nghe DOM cho video-chat | tham số truyền vào là id của box nhập nội dung tin nhắn
     videoChat(divId);
   });
 }
@@ -202,6 +205,6 @@ $(document).ready(function() {
   // Tham số chỉ được phép trong khoảng từ 1 đến 5
   // gridPhotos(5);
 
-  // trỏ đến cuộc trò chuyện đầu tiên khi reload trang
+  // trỏ đến cuộc trò chuyện đầu tiên ở leftside khi reload trang
   $('ul.people').find('a')[0].click();
 });

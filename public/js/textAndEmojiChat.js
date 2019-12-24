@@ -51,18 +51,18 @@ function textAndEmojiChat(divId) {
                     dataToEmit.groupId = targetId;
 
                     // cập nhật tin nhắn mới nhất lên preview
-                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
+                    $(`.person[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
                     // cập thời gian của tin nhắn mới nhất lên preview
-                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
+                    $(`.person[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
                 } else {
                     let sendTime = `<span class="time-chat">${ moment(data.message.createdAt).locale("en").format('hh:mm:ss a, DD/MM/YYYY') }</span>`;
                     messageOfMe.html(`${convertEmojiMessage}<br>${sendTime}`);
                     dataToEmit.personalId = targetId;
 
                     // cập nhật tin nhắn mới nhất lên preview
-                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
+                    $(`.person[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
                     // cập thời gian của tin nhắn mới nhất lên preview
-                    $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
+                    $(`.person[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
                 }
 
                 // step 02: append message data to screen
@@ -103,10 +103,13 @@ $(document).ready(function () {
 
             $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
 
+            // ngừng typing (đang nhập)
+            $(`.right .chat[data-chat=${divId}] .bubble-typing-gif`).remove();
+
             // cập nhật tin nhắn mới nhất lên preview
-            $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
+            $(`.person[data-chat = ${divId}] .preview`).html(data.message.sender.name + ": " + data.message.text.substring(0, 25) + "...");
             // cập thời gian của tin nhắn mới nhất lên preview
-            $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
+            $(`.person[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
         } 
         // đẩy tin nhắn mới gửi lên phía người nhận
         if (data.personalId) {
@@ -121,10 +124,13 @@ $(document).ready(function () {
                 // đẩy tin nhắn mới lên screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfYou);
 
+                // ngừng typing (đang nhập)
+                $(`.right .chat[data-chat=${divId}] .bubble-typing-gif`).remove();
+
                 // cập nhật tin nhắn mới nhất lên preview
-                $(`.left .tab-content ul.people li[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
+                $(`.person[data-chat = ${divId}] .preview`).html(data.message.text.substring(0, 25) + "...");
                 // cập thời gian của tin nhắn mới nhất lên preview
-                $(`.left .tab-content ul.people li[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
+                $(`.person[data-chat = ${divId}] .time`).html(moment(data.message.createdAt).locale("en").fromNow());
             }
         }
         // gọi lại hàm nineScrollRight để cuộn đến cuối cùng của screen tin nhắn
@@ -136,24 +142,26 @@ $(document).ready(function () {
     socket.on("server-send-back-typing", function(typingData) {
         var currentUserId = $('#currentUserId').val();
         // đối vớ group - gửi thằng đến rightside của cuộc trò chuyện
-        let typing = `<img src="images/icon/typing.gif" title="${typingData.senderName}">`;
-        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).html('');
-        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).append(typing);
+        let typing = `<div class="bubble you bubble-typing-gif"><img src="images/icon/typing.gif" title="${typingData.senderName}"></div>`;
+        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).remove();
+        $(`.right .chat[data-chat=${typingData.receiverId}]`).append(typing);
         // đối với personal
         if (typingData.receiverId == currentUserId) {
-            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).html('');
+            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).remove();
             // phía client khác sẽ dựa vào senderId bằng với id cuộc trò chuyện họ trỏ tới để nhận sự kiện
-            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).append(typing);
+            $(`.right .chat[data-chat=${typingData.senderId}]`).append(typing);
+            nineScrollRight(divId);
         }
     })
     // ngừng nhập tin nhắn
     socket.on("server-send-back-stop-typing", function(typingData) {
         // đối với group
-        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).html('');
+        $(`.right .chat[data-chat=${typingData.receiverId}] .bubble-typing-gif`).remove();
         // đối với personal
         var currentUserId = $('#currentUserId').val();
         if (typingData.receiverId == currentUserId) {
-            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).html('');
+            $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).remove();
+            nineScrollRight(divId);
         }
     })
 })

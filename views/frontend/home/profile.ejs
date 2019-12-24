@@ -21,7 +21,10 @@
                         <div class="card-block">
                             <img src="<%= user.image_path %>" alt="Avatar" id="image-upload">
                             <div class="form-group mt-3">
-                                <input type="file" class="form-control" id="upload-path" name="image_path">
+                                <label for="upload-path">
+                                    <input type="file" class="form-control image-chat" id="upload-path" name="image_path">
+                                    <i class="fa fa-photo"></i><p>Choose new avatar</p>
+                                </label>
                             </div>
                         </div>
                     </div>

@@ -10,7 +10,7 @@ const multer = require('multer');
 // const csrfProtection = csrf();
 // router.use(csrfProtection);
 
-/* Upload File */
+/* Upload File - upload image for change-avatar */
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './public/uploads/avatar-user/')

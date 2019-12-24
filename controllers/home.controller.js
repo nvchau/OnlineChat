@@ -2,7 +2,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
-const Helper = require('../helper/helper');
 const Member = require('../models/member');
 
 exports.index = (req, res, next) => {
@@ -140,7 +139,7 @@ exports.getProfile = (req, res, next) => {
 exports.postEditProfile = (req, res, next) => {
     let currentUserId = req.session.user._id;
 
-    console.log(req.file);
+    // console.log(req.file);
 
     var firstname = req.body.firstname !== null ? req.body.firstname : user.info.firstname;
     var lastname = req.body.lastname !== null ? req.body.lastname : user.info.lastname;

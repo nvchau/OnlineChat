@@ -269,6 +269,11 @@ io.on("connection", function(socket) {
     })
     // =========== KẾT THÚC TYPING ==============
 
+    // ============== IMAGE CHAT ================
+    socket.on("image-chat", function(data) {
+        socket.broadcast.emit("server-send-back-data-image-chat", data);
+    })
+    // ========== KẾT THÚC IMAGE CHAT ===========
 });
 // ===============================================================
 // ===============================================================

@@ -26,18 +26,20 @@
             <!-- video-chat -->
             <% include modals/videoChat %>
         </div>
+        <b style="float: right; color: honeydew; margin-top: 3px;">Make by Châu Nguyễn</b>
+
+        <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
+        <input type="hidden" name="currentUserName" id="currentUserName" value="<%= user.info.firstname %> <%= user.info.lastname %>">
+
+        <% if (messagesWelcome) {%>
+            <input type="hidden" name="messages" id="messages" value="<%= messagesWelcome %>">
+        <% } else if (messagesChangepassword) { %>
+            <input type="hidden" name="messages" id="messages" value="<%= messagesChangepassword %>">
+        <% } else if (messageEditProfile) { %>
+            <input type="hidden" name="messages" id="messages" value="<%= messageEditProfile %>">
+        <% } %>
+
     </div>
-
-    <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
-    <input type="hidden" name="currentUserName" id="currentUserName" value="<%= user.info.firstname %> <%= user.info.lastname %>">
-
-    <% if (messagesWelcome) {%>
-        <input type="hidden" name="messages" id="messages" value="<%= messagesWelcome %>">
-    <% } else if (messagesChangepassword) { %>
-        <input type="hidden" name="messages" id="messages" value="<%= messagesChangepassword %>">
-    <% } else if (messageEditProfile) { %>
-        <input type="hidden" name="messages" id="messages" value="<%= messageEditProfile %>">
-    <% } %>
 
     <% include ../../layouts/script %>
 </body>

@@ -18,7 +18,7 @@ var MessageSchema = new Schema({
         avatar: String
     },
     text: String,
-    // file: {data: Buffer, contentType: String, fileName: String},
+    file: {data: Buffer, contentType: String, fileName: String},
     createdAt: {type: String, default: new Date()},
     updatedAt: {type: String, default: null},
     deletedAt: {type: String, default: null}

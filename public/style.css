@@ -23,9 +23,14 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 400;
   /* background-image: url("images/background/image.jpg"); */
+  background-color: #333;
   background-size: cover;
   background-repeat: none;
 }
+
+/* .container-fluid {
+  background-color: #333;
+} */
 
 .alertify-notifier .ajs-message.ajs-error {
   color: #fff;
@@ -836,9 +841,9 @@ label:focus,
   flex-direction: column;
 }
 
-#image-chat,
-#attach-chat {
-  display: none;
+.image-chat,
+.attach-chat {
+  display: none !important;
 }
 
 .room-chat:hover,
@@ -1341,5 +1346,29 @@ label:focus,
 
 .list-members {
   list-style-type: none;
+}
+
+.profile .avatar {
+  text-align: center;
+}
+
+/* change avatar */
+.profile .avatar label {
+  width: 100%;
+  text-align: center;
+  border: #2ECC81 solid 1px;
+  padding: 8px 5px 0px 5px;
+  margin-top: 10px;
+}
+
+.profile .avatar i {
+  font-size: 20px;
+  font-weight: 500;
+  margin-right: 10px;
+  color: #2ECC81;
+}
+
+.profile .avatar p {
+  color: #2ECC81;
 }
 /* =============================== */
