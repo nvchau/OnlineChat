@@ -12,12 +12,9 @@
                 
                 <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
-                </div>
-                <!-- <div class="top">
-                    <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
                     <span class="chat-menu-right">
-                        <a href="#attachsModal" id="show-attachs" data-toggle="modal">
-                            Tệp đính kèm
+                        <a href="#attachmentsModal" id="show-attachments" data-toggle="modal">
+                            Attachments
                             <i class="fa fa-paperclip"></i>
                         </a>
                     </span>
@@ -26,11 +23,11 @@
                     </span>
                     <span class="chat-menu-right">
                         <a href="#imagesModal" id="show-images" data-toggle="modal">
-                            Hình ảnh
+                            Images
                             <i class="fa fa-photo"></i>
                         </a>
                     </span>
-                </div> -->
+                </div>
                 
                 <div class="content-chat">
                     <div class="chat" data-chat="<%= member_item._id %>">
@@ -66,7 +63,7 @@
                                     <% } %>
                                     <!-- kiểu file -->
                                     <% if (message_item.messageType === 'file') { %>
-                                        <div id="last_mess_personal_file" class="bubble bubble-image-file
+                                        <div id="last_mess_personal_attachment" class="bubble bubble-image-file
                                         <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>" data-mess-id="<%= message_item._id %>">
                                             <a href="data:<%= message_item.file.contentType %>; base64, <%= message_item.file.data.toString('base64') %>"
@@ -92,8 +89,8 @@
                             class="image-chat" data-chat="<%= member_item._id %>">
                             <i class="fa fa-photo"></i>
                         </label>
-                        <label for="attach-chat">
-                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat"
+                        <label for="attachments-chat">
+                            <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat"
                             data-chat="<%= member_item._id %>">
                             <i class="fa fa-paperclip"></i>
                         </label>
@@ -117,6 +114,21 @@
                         <a href="#memberGroup_<%= group_item._id %>" data-toggle="modal" data-target="#memberGroup_<%= group_item._id %>">
                             Members (<%= group_item.members.length %>) &nbsp;
                             <i class="fa fa-users"></i>
+                        </a>
+                    </span>
+                    <span class="chat-menu-right">
+                        <a href="#attachmentsModal" id="show-attachments" data-toggle="modal">
+                            Attachments
+                            <i class="fa fa-paperclip"></i>
+                        </a>
+                    </span>
+                    <span class="chat-menu-right">
+                        <a href="javascript:void(0)">&nbsp;</a>
+                    </span>
+                    <span class="chat-menu-right">
+                        <a href="#imagesModal" id="show-images" data-toggle="modal">
+                            Images
+                            <i class="fa fa-photo"></i>
                         </a>
                     </span>
                 </div>
@@ -188,8 +200,8 @@
                             class="image-chat chat-in-group" data-chat="<%= group_item._id %>">
                             <i class="fa fa-photo"></i>
                         </label>
-                        <label for="attach-chat">
-                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="<%= group_item._id %>">
+                        <label for="attachments-chat">
+                            <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat" data-chat="<%= group_item._id %>">
                             <i class="fa fa-paperclip"></i>
                         </label>
                         <!-- <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal">

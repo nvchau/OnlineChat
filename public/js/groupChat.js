@@ -161,18 +161,15 @@ function callCreateGroupChat() {
                         <input type="text" class="write-chat chat-in-group" id="write-chat-${data.groupData._id}" data-chat="${data.groupData._id}">
                         <div class="icons">
                             <a href="#" class="icon-chat" data-chat="${data.groupData._id}"><i class="fa fa-smile-o"></i></a>
-                            <!-- <label for="image-chat">
-                                <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data.groupData._id}">
+                            <label for="image-chat-${data.groupData._id}">
+                                <input type="file" id="image-chat-${data.groupData._id}" name="my-image-chat"
+                                class="image-chat chat-in-group" data-chat="${data.groupData._id}">
                                 <i class="fa fa-photo"></i>
                             </label>
-                            <label for="attach-chat">
-                                <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data.groupData._id}">
+                            <label for="attachments-chat">
+                                <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat" data-chat="${data.groupData._id}">
                                 <i class="fa fa-paperclip"></i>
                             </label>
-                            <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data.groupData._id}" data-toggle="modal">
-                                <i class="fa fa-video-camera"></i>
-                            </a> -->
-                            <input type="hidden" id="peer-id" value="">
                         </div>
                     </div>
                 
@@ -302,18 +299,15 @@ $(document).ready(function() {
                     <input type="text" class="write-chat chat-in-group" id="write-chat-${data.groupData._id}" data-chat="${data.groupData._id}">
                     <div class="icons">
                         <a href="#" class="icon-chat" data-chat="${data.groupData._id}"><i class="fa fa-smile-o"></i></a>
-                        <!-- <label for="image-chat">
-                            <input type="file" id="image-chat" name="my-image-chat" class="image-chat" data-chat="${data.groupData._id}">
+                        <label for="image-chat-${data.groupData._id}">
+                            <input type="file" id="image-chat-${data.groupData._id}" name="my-image-chat"
+                            class="image-chat chat-in-group" data-chat="${data.groupData._id}">
                             <i class="fa fa-photo"></i>
                         </label>
-                        <label for="attach-chat">
-                            <input type="file" id="attach-chat" name="my-attach-chat" class="attach-chat" data-chat="${data.groupData._id}">
+                        <label for="attachments-chat">
+                            <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat" data-chat="${data.groupData._id}">
                             <i class="fa fa-paperclip"></i>
                         </label>
-                        <a href="#streamModal" id="video-chat" class="video-chat" data-chat="${data.groupData._id}" data-toggle="modal">
-                            <i class="fa fa-video-camera"></i>
-                        </a> -->
-                        <input type="hidden" id="peer-id" value="">
                     </div>
                 </div>
             </div>
