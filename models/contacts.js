@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var contactSchema = new Schema({
     memberId: String,
     contactId: String,
-    status: Boolean,
+    status: {type: Boolean, default: false},
     createdAt: {type: String, default: new Date()},
     updatedAt: {type: String, default: null},
     deletedAt: {type: String, default: null}
@@ -12,4 +12,4 @@ var contactSchema = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Member', contactSchema);
+module.exports = mongoose.model('Contacts', contactSchema);

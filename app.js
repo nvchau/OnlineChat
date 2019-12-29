@@ -27,6 +27,7 @@ var Member = require('./models/member');
 
 var app = express();
 
+mongoose.Promise = global.Promise;
 mongoose.connect(database.dbStr, {useMongoClient: true}, function(){
     console.log('Connected Database!');
 });
@@ -34,7 +35,7 @@ mongoose.connection.on('error', function(err) {
     console.log('Error connect to Database: ' + err);
 });
 
-// ,oment
+// moment
 app.locals.moment = require('moment');
 
 app.set('views', path.join(__dirname, 'views'));

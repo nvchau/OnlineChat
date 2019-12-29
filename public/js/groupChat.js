@@ -39,13 +39,13 @@ function callSearchUser(element) {
             return false;
         }
 
-        $.get(`/chatapp/search-user/${keyword}`, // gửi keyword qua params
+        $.get(`/chatapp/search-friend/${keyword}`, // gửi keyword qua params
         function(data) { // nhận lại data từ server
             var currentUser = $('#currentUserId').val();
             // mỗi lần tìm kiếm thì làm sạch list cũ
             $('ul#group-chat-friends').html('');
 
-            for (var userItem of data.usersListSearch) {
+            for (var userItem of data.userListSearchToSend) {
                 if (userItem._id != currentUser) {
                     $('ul#group-chat-friends').append(`
                         <div data-uid="${userItem._id}">
@@ -166,8 +166,9 @@ function callCreateGroupChat() {
                                 class="image-chat chat-in-group" data-chat="${data.groupData._id}">
                                 <i class="fa fa-photo"></i>
                             </label>
-                            <label for="attachments-chat">
-                                <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat" data-chat="${data.groupData._id}">
+                            <label for="attachments-chat-${data.groupData._id}">
+                                <input type="file" id="attachments-chat-${data.groupData._id}" name="my-attachments-chat"
+                                class="attachments-chat chat-in-group" data-chat="${data.groupData._id}">
                                 <i class="fa fa-paperclip"></i>
                             </label>
                         </div>

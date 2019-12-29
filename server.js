@@ -274,6 +274,12 @@ io.on("connection", function(socket) {
         socket.broadcast.emit("server-send-back-data-image-chat", data);
     })
     // ========== KẾT THÚC IMAGE CHAT ===========
+
+    // ============== ATTACHMENT CHAT ================
+    socket.on("attachment-chat", function(data) {
+        socket.broadcast.emit("server-send-back-data-attachment-chat", data);
+    })
+    // ========== KẾT THÚC ATTACHMENT CHAT ===========
 });
 // ===============================================================
 // ===============================================================

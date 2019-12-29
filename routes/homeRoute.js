@@ -10,6 +10,9 @@ const multer = require('multer');
 // const csrfProtection = csrf();
 // router.use(csrfProtection);
 
+// home -> login
+router.get('/', passport.notLoggedIn, home_controller.login);
+
 /* Upload File - upload image for change-avatar */
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -32,9 +35,6 @@ let upload = multer({
   storage: storage,
   limits: { fileSize: '4MB' }
 });
-
-// home -> login
-router.get('/', passport.notLoggedIn, home_controller.login);
 
 router.get('/login', passport.notLoggedIn, home_controller.login);
 router.post('/login', home_controller.postLogin);

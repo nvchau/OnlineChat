@@ -13,29 +13,36 @@
             <div class="tab-pane active" id="all-chat">
                 <ul class="people no-padding-start">
                     <% member.forEach(function(member_item, index){ %>
-                        <% if (member_item._id.toString() !== user._id.toString()) { %>
-                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
-                                <li class="person" data-chat="<%= member_item._id %>">
-                                    <div class="left-avatar">
-                                        <!-- <div class="dot online"></div> -->
-                                        <div class="status dot"></div>
-                                        <img src="<%= member_item.image_path %>" alt="">
-                                    </div>
-
-                                    <span class="name">
-                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
-                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
-                                        <% } else { %>
-                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                        <% contacts.forEach(function(contact_item, index){ %> 
+                            <% if (contact_item.status === true) { %>
+                                <% if (member_item._id.toString() !== user._id.toString()) { %>
+                                    <% if ((contact_item.memberId.toString() === user._id.toString())
+                                    || (contact_item.contactId.toString() === user._id.toString())) { %>
+                                        <% if ((contact_item.contactId.toString() === member_item._id.toString())
+                                        || contact_item.memberId.toString() === member_item._id.toString()) { %>
+                                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
+                                                <li class="person" data-chat="<%= member_item._id %>">
+                                                    <div class="left-avatar">
+                                                        <!-- <div class="dot online"></div> -->
+                                                        <div class="status dot"></div>
+                                                        <img src="<%= member_item.image_path %>" alt="">
+                                                    </div>
+                                                    <span class="name">
+                                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
+                                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
+                                                        <% } else { %>
+                                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                                        <% } %>
+                                                    </span><br>
+                                                    <span class="time"></span>
+                                                    <span class="preview"></span>
+                                                </li>
+                                            </a>
                                         <% } %>
-                                    </span><br>
-                                    <!-- hiển thị thời gian của tin nhắn cuối cùng -->
-                                    <span class="time"></span>
-                                    <!-- hiển thị tin nhắn cuối cùng -->
-                                    <span class="preview"></span>
-                                </li>
-                            </a>
-                        <% } %>
+                                    <% } %>
+                                <% } %>
+                            <% } %>
+                        <% }); %>
                     <% }); %>
                 </ul>
 
@@ -68,39 +75,59 @@
                     <% }); %>
                 </ul>
 
-                <!-- <div class="load_more_chat">
-                    <a href="">Load more...</a>
+                <!-- <div class="read-more-all-chat">
+                    <a href="javascript:void(0)" id="link-read-more-all-chat">
+                        <strong>Load more...</strong>
+                    </a>
+                    <div class="read-more-all-chat-loader"></div>
                 </div> -->
             </div>
+
             <!-- user chat -->
             <div class="tab-pane" id="user-chat">
                 <ul class="people no-padding-start">
                     <% member.forEach(function(member_item, index){ %>
-                        <% if (member_item._id.toString() !== user._id.toString()) { %>
-                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
-                                <li class="person" data-chat="<%= member_item._id %>">
-                                    <div class="left-avatar">
-                                        <!-- <div class="dot online"></div> -->
-                                        <img src="<%= member_item.image_path %>" alt="">
-                                    </div>
-                                    <span class="name">
-                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
-                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
-                                        <% } else { %>
-                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                        <% contacts.forEach(function(contact_item, index){ %> 
+                            <% if (contact_item.status === true) { %>
+                                <% if (member_item._id.toString() !== user._id.toString()) { %>
+                                    <% if ((contact_item.memberId.toString() === user._id.toString())
+                                    || (contact_item.contactId.toString() === user._id.toString())) { %>
+                                        <% if ((contact_item.contactId.toString() === member_item._id.toString())
+                                        || contact_item.memberId.toString() === member_item._id.toString()) { %>
+                                            <a href="#uid_<%= member_item._id %>" class="room-chat" id="null-contact" data-target="#to_<%= member_item._id %>">
+                                                <li class="person" data-chat="<%= member_item._id %>">
+                                                    <div class="left-avatar">
+                                                        <!-- <div class="dot online"></div> -->
+                                                        <div class="status dot"></div>
+                                                        <img src="<%= member_item.image_path %>" alt="">
+                                                    </div>
+                                                    <span class="name">
+                                                        <% if(member_item.info.firstname.length + member_item.info.lastname.length > 15) { %>
+                                                            <%= member_item.info.firstname %> <%= member_item.info.lastname.substring(0, member_item.info.lastname.length - (member_item.info.lastname.length - 10) ) %><span>...</span>
+                                                        <% } else { %>
+                                                            <%= member_item.info.firstname %> <%= member_item.info.lastname %>
+                                                        <% } %>
+                                                    </span><br>
+                                                    <span class="time"></span>
+                                                    <span class="preview"></span>
+                                                </li>
+                                            </a>
                                         <% } %>
-                                    </span><br>
-                                    <span class="time"></span>
-                                    <span class="preview"></span>
-                                </li>
-                            </a>
-                        <% } %>
+                                    <% } %>
+                                <% } %>
+                            <% } %>
+                        <% }); %>
                     <% }); %>
                 </ul>
-                <!-- <div class="load_more_chat">
-                    <a href="">Load more...</a>
+                
+                <!-- <div class="read-more-user-chat">
+                    <a href="javascript:void(0)" id="link-read-more-user-chat">
+                        <strong>Load more...</strong>
+                    </a>
+                    <div class="read-more-user-chat-loader"></div>
                 </div> -->
             </div>
+
             <!-- group chat -->
             <div class="tab-pane" id="group-chat">
                 <ul class="people no-padding-start group">
@@ -130,8 +157,12 @@
                         <% }) %>
                     <% }); %>
                 </ul>
-                <!-- <div class="load_more_chat">
-                    <a href="">Load more...</a>
+                
+                <!-- <div class="read-more-group-chat">
+                    <a href="javascript:void(0)" id="link-read-more-group-chat">
+                        <strong>Load more...</strong>
+                    </a>
+                    <div class="read-more-group-chat-loader"></div>
                 </div> -->
             </div>
         </div>

@@ -68,11 +68,11 @@ function textAndEmojiChat(divId) {
                 // step 02: append message data to screen
                 $(`.right .chat[data-chat=${divId}]`).append(messageOfMe);
 
-                nineScrollRight(divId); // gọi lại hàm để cuộn đến tin nhắn cuối
-
                 // step 03: remove all data in input
                 $(`#write-chat-${divId}`).val('');
                 $(`.right .write[data-chat=${divId}]`).find('.emojionearea-editor').text('');
+
+                nineScrollRight(divId); // gọi lại hàm để cuộn đến tin nhắn cuối
 
                 // gửi data tin nhắn lên socket server
                 socket.emit("chat-text-emoji", dataToEmit);
@@ -150,8 +150,8 @@ $(document).ready(function () {
             $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).remove();
             // phía client khác sẽ dựa vào senderId bằng với id cuộc trò chuyện họ trỏ tới để nhận sự kiện
             $(`.right .chat[data-chat=${typingData.senderId}]`).append(typing);
-            nineScrollRight(divId);
         }
+        nineScrollRight(divId);
     })
     // ngừng nhập tin nhắn
     socket.on("server-send-back-stop-typing", function(typingData) {
@@ -161,7 +161,7 @@ $(document).ready(function () {
         var currentUserId = $('#currentUserId').val();
         if (typingData.receiverId == currentUserId) {
             $(`.right .chat[data-chat=${typingData.senderId}] .bubble-typing-gif`).remove();
-            nineScrollRight(divId);
         }
+        nineScrollRight(divId);
     })
 })

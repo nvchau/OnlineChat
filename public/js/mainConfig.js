@@ -104,39 +104,61 @@ function configNotification() {
   });
 }
 
-// function gridPhotos(layoutNumber) {
-//   let countRows = Math.ceil($('#imagesModal').find('div.all-images>img').length / layoutNumber);
-//   let layoutStr = new Array(countRows).fill(layoutNumber).join("");
-//   $('#imagesModal').find('div.all-images').photosetGrid({
-//     highresLinks: true,
-//     rel: 'withhearts-gallery',
-//     gutter: '2px',
-//     layout: layoutStr,
-//     onComplete: function() {
-//       $('.all-images').css({
-//         'visibility': 'visible'
-//       });
-//       $('.all-images a').colorbox({
-//         photo: true,
-//         scalePhotos: true,
-//         maxHeight: '90%',
-//         maxWidth: '90%'
-//       });
-//     }
-//   });
-// }
+function gridPhotos(layoutNumber) {
+  $(".show-images").unbind("click").on("click", function() {
+    let href = $(this).attr("href");
+    let modalImagesId = href.replace("#", "");
 
-// ẩn hiện nút tạo group khi chuyển chế độ chat
-// function showButtonGroupChat() {
-//   $('#select-type-chat').bind('change', function() {
-//     if ($(this).val() === 'group-chat') {
-//       $('.create-group-chat').show();
-//       // Do something...
-//     } else {
-//       $('.create-group-chat').hide();
-//     }
-//   });
-// }
+    let countRows = Math.ceil($(`#${modalImagesId}`).find('div.all-images>img').length / layoutNumber);
+    let layoutStr = new Array(countRows).fill(layoutNumber).join("");
+    $(`#${modalImagesId}`).find('div.all-images').photosetGrid({ // LỖI Ở ĐÂY 
+      highresLinks: true,
+      rel: 'withhearts-gallery',
+      gutter: '2px',
+      layout: layoutStr,
+      onComplete: function() {
+        $(`#${modalImagesId}`).find('.all-images').css({
+          'visibility': 'visible'
+        });
+        $(`#${modalImagesId}`).find('.all-images a').colorbox({
+          photo: true,
+          scalePhotos: true,
+          maxHeight: '90%',
+          maxWidth: '90%'
+        });
+      }
+    });
+  });
+}
+
+
+function addFriendsToGroup() {
+  $('ul#group-chat-friends').find('div.add-user').bind('click', function() {
+    let uid = $(this).data('uid');
+    $(this).remove();
+    let html = $('ul#group-chat-friends').find('div[data-uid=' + uid + ']').html();
+
+    let promise = new Promise(function(resolve, reject) {
+      $('ul#friends-added').append(html);
+      $('#groupChatModal .list-user-added').show();
+      resolve(true);
+    });
+    promise.then(function(success) {
+      $('ul#group-chat-friends').find('div[data-uid=' + uid + ']').remove();
+    });
+  });
+}
+
+function cancelCreateGroup() {
+  $('#cancel-group-chat').bind('click', function() {
+    $('#groupChatModal .list-user-added').hide();
+    if ($('ul#friends-added>li').length) {
+      $('ul#friends-added>li').each(function(index) {
+        $(this).remove();
+      });
+    }
+  });
+}
 
 // thay đổi kiểu chat (trong select ở leftside)
 function changeTypeChat(){
@@ -175,6 +197,9 @@ function changeScreenChat(){
 
     // Lắng nghe DOM cho video-chat | tham số truyền vào là id của box nhập nội dung tin nhắn
     videoChat(divId);
+
+    // Lắng nghe DOM cho attachment-chat (tệp đính kèm) | tham số truyền vào là id của box nhập nội dung tin nhắn
+    attachmentsChat(divId)
   });
 }
 
@@ -198,12 +223,9 @@ $(document).ready(function() {
   // Icon loading khi chạy ajax
   ajaxLoading();
 
-  // Hiển thị button mở modal tạo nhóm trò chuyện
-  // showButtonGroupChat();
-
   // Hiển thị hình ảnh grid slide trong modal tất cả ảnh, tham số truyền vào là số ảnh được hiển thị trên 1 hàng.
-  // Tham số chỉ được phép trong khoảng từ 1 đến 5
-  // gridPhotos(5);
+  // Tham số chỉ được phép trong khoảng từ 1 đến 5 | tương ứng với số ảnh trên mỗi hàng
+  // gridPhotos(5); // đang lỗi chưa chạy được -> đang tạm set css
 
   // trỏ đến cuộc trò chuyện đầu tiên ở leftside khi reload trang
   $('ul.people').find('a')[0].click();

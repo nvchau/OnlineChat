@@ -10,9 +10,17 @@ router.get('/', passport.isLoggedIn, chatapp_controller.home);
 router.post('/message/add-new-text-emoji', passport.isLoggedIn, chatapp_controller.addNewTextEmoji);
 // image chat (ajax)
 router.post('/message/add-new-image', passport.isLoggedIn, chatapp_controller.addNewImage);
-// searh ajax
-router.get('/search-user/:keywork', passport.isLoggedIn, chatapp_controller.searchUsers);
-
+// attachment chat (ajax)
+router.post('/message/add-new-attachment', passport.isLoggedIn, chatapp_controller.addNewAttachment);
+// searh contact (friend) ajax
+router.get('/search-friend/:keywork', passport.isLoggedIn, chatapp_controller.searchFriend);
+// tạo group chat
 router.post('/group-chat/create-new-group', passport.isLoggedIn, chatapp_controller.createGroupChat);
+// searh user ajax
+router.get('/search-user/:keywork', passport.isLoggedIn, chatapp_controller.searchUser);
+// kết bạn (ajax) - add contact
+router.post('/contact/add-new', passport.isLoggedIn, chatapp_controller.addNewContact);
+// hủy yêu cầu kết bạn (ajax) - remove request contact
+router.delete('/contact/remove-request-contact', passport.isLoggedIn, chatapp_controller.removeRequestContact);
 
 module.exports = router;

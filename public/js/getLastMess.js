@@ -41,7 +41,7 @@ function getLastMessGroup() {
     // tìm đến tất cả các div có id = last_mess ở vị trí kề vị trí cuối cùng (cuối là div typing)
     var listLastDivMessText = document.querySelectorAll("#last_mess_group_text:nth-last-of-type(1)"); // kiểu text
     var listLastDivMessImage = document.querySelectorAll("#last_mess_group_image:nth-last-of-type(1)"); // kiểu hình
-    var listLastDivMessFile = document.querySelectorAll("#last_mess_personal_attachment:nth-last-of-type(1)"); // kiểu tệp
+    var listLastDivMessFile = document.querySelectorAll("#last_mess_group_attachment:nth-last-of-type(1)"); // kiểu tệp
     // hiển thị text
     for(var i of listLastDivMessText) {
         // console.log(i.children[0].textContent)

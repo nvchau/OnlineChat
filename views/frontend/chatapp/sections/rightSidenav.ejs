@@ -13,7 +13,7 @@
                 <div class="top">
                     <span>To: <span class="name"><%= member_item.info.firstname %> <%= member_item.info.lastname %></span></span>
                     <span class="chat-menu-right">
-                        <a href="#attachmentsModal" id="show-attachments" data-toggle="modal">
+                        <a href="#attachmentsModal_<%= member_item._id %>" class="show-attachments" data-toggle="modal">
                             Attachments
                             <i class="fa fa-paperclip"></i>
                         </a>
@@ -22,7 +22,7 @@
                         <a href="javascript:void(0)">&nbsp;</a>
                     </span>
                     <span class="chat-menu-right">
-                        <a href="#imagesModal" id="show-images" data-toggle="modal">
+                        <a href="#imagesModal_<%= member_item._id %>" class="show-images" data-toggle="modal">
                             Images
                             <i class="fa fa-photo"></i>
                         </a>
@@ -61,13 +61,13 @@
                                             <span id="member-id-chat" style="display: none;"><%= member_item._id %></span>
                                         </div>
                                     <% } %>
-                                    <!-- kiểu file -->
-                                    <% if (message_item.messageType === 'file') { %>
-                                        <div id="last_mess_personal_attachment" class="bubble bubble-image-file
+                                    <!-- kiểu tệp đính kèm (attachment) -->
+                                    <% if (message_item.messageType === 'attachment') { %>
+                                        <div id="last_mess_personal_attachment" class="bubble bubble-attachments-file
                                         <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>" data-mess-id="<%= message_item._id %>">
                                             <a href="data:<%= message_item.file.contentType %>; base64, <%= message_item.file.data.toString('base64') %>"
-                                                download="<%= message_item.file.fileName %>">
+                                                download="<%= message_item.file.fileName %>" title="<%= moment(message_item.createdAt).locale('en').format('hh:mm:ss a, DD/MM/YYYY'); %>">
                                                 <%= message_item.file.fileName %>
                                             </a>
                                             <span id="time-chat-to-get" style="display: none;"><%= message_item.createdAt %></span>
@@ -89,9 +89,9 @@
                             class="image-chat" data-chat="<%= member_item._id %>">
                             <i class="fa fa-photo"></i>
                         </label>
-                        <label for="attachments-chat">
-                            <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat"
-                            data-chat="<%= member_item._id %>">
+                        <label for="attachments-chat-<%= member_item._id %>">
+                            <input type="file" id="attachments-chat-<%= member_item._id %>" name="my-attachments-chat"
+                            class="attachments-chat" data-chat="<%= member_item._id %>">
                             <i class="fa fa-paperclip"></i>
                         </label>
                         <a href="javascript:void(0)" id="video-chat-<%= member_item._id %>" 
@@ -117,7 +117,7 @@
                         </a>
                     </span>
                     <span class="chat-menu-right">
-                        <a href="#attachmentsModal" id="show-attachments" data-toggle="modal">
+                        <a href="#attachmentsModal_<%= group_item._id %>" class="show-attachments" data-toggle="modal">
                             Attachments
                             <i class="fa fa-paperclip"></i>
                         </a>
@@ -126,7 +126,7 @@
                         <a href="javascript:void(0)">&nbsp;</a>
                     </span>
                     <span class="chat-menu-right">
-                        <a href="#imagesModal" id="show-images" data-toggle="modal">
+                        <a href="#imagesModal_<%= group_item._id %>" class="show-images" data-toggle="modal">
                             Images
                             <i class="fa fa-photo"></i>
                         </a>
@@ -169,15 +169,15 @@
                                             <span id="time-chat-to-get" style="display: none;"><%= message_item.sender.name %></span>
                                         </div>
                                     <% } %>
-                                    <!-- kiểu file -->
-                                    <% if (message_item.messageType === 'file') { %>
-                                        <div id="last_mess_group_file" class="bubble bubble-image-file
+                                    <!-- kiểu tệp đính kèm (attachment) -->
+                                    <% if (message_item.messageType === 'attachment') { %>
+                                        <div id="last_mess_group_attachment" class="bubble bubble-attachments-file
                                         <% if(message_item.senderId.toString() === user._id.toString()) { %> me
                                             <% } else { %> you <% } %>" data-mess-id="<%= message_item._id %>">
                                             <img class="avatar-small" src="<%= message_item.sender.avatar %>" title="<%= message_item.sender.name %>"
                                             alt="<%= message_item.sender.avatar %>">
                                             <a href="data:<%= message_item.file.contentType %>; base64, <%= message_item.file.data.toString('base64') %>"
-                                                download="<%= message_item.file.fileName %>">
+                                                download="<%= message_item.file.fileName %>" title="<%= moment(message_item.createdAt).locale('en').format('hh:mm:ss a, DD/MM/YYYY'); %>">
                                                 <%= message_item.file.fileName %>
                                             </a>
                                             <span id="time-chat-to-get" style="display: none;"><%= message_item.createdAt %></span>
@@ -200,8 +200,9 @@
                             class="image-chat chat-in-group" data-chat="<%= group_item._id %>">
                             <i class="fa fa-photo"></i>
                         </label>
-                        <label for="attachments-chat">
-                            <input type="file" id="attachments-chat" name="my-attachments-chat" class="attachments-chat" data-chat="<%= group_item._id %>">
+                        <label for="attachments-chat-<%= group_item._id %>">
+                            <input type="file" id="attachments-chat-<%= group_item._id %>" name="my-attachments-chat"
+                            class="attachments-chat chat-in-group" data-chat="<%= group_item._id %>">
                             <i class="fa fa-paperclip"></i>
                         </label>
                         <!-- <a href="#streamModal" id="video-chat" class="video-chat" data-chat="<%= group_item._id %>" data-toggle="modal">
