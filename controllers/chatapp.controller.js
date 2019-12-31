@@ -2,14 +2,14 @@ const Member    = require('../models/member');
 const Group     = require('../models/groupchat');
 const Messages  = require('../models/messages');
 const Contacts  = require('../models/contacts');
+const Notifications = require('../models/notifications');
 
 const multer    = require('multer');
 const fsExtra   = require('fs-extra')
 
 // import {lastItemOfArray, convertTimestampToHumanTime} from '../helper/clientHelper';
 
-exports.home = (req, res, next) => {
-    // console.log(req.session.user._id)
+exports.home = async (req, res, next) => {
     let messagesWelcome = req.flash('messagesWelcome'); // message nhận từ flash của login
     if (messagesWelcome.length > 0) {
         messagesWelcome = messagesWelcome[0];
@@ -31,19 +31,86 @@ exports.home = (req, res, next) => {
         messageEditProfile = null;
     }
     
-    Member.find().then(member => { //{ _id: req.session.user._id }
-        Contacts.find().then(contacts => {
-            Group.find().then(group => {
-                Messages.find().sort({createdAt: 1}).then(messages => { //.sort({createdAt: 1}): sắp xếp theo thời gian giản dần
-                    res.render('frontend/chatapp/home', {
-                        pageTitle: 'WebChat',
-                        member   : member,
-                        group    : group,
-                        messages : messages,
-                        contacts : contacts,
-                        messagesWelcome : messagesWelcome,
-                        messagesChangepassword : messagesChangepassword,
-                        messageEditProfile : messageEditProfile,
+    let currentUserId = req.session.user._id;
+
+    await Member.find().sort({createdAt: -1}).then( async member => { //{ _id: req.session.user._id }
+        await Contacts.find().sort({createdAt: -1}).then( async contacts => {
+            await Group.find().then( async group => {
+                await Messages.find().sort({createdAt: 1}).then( async messages => { //.sort({createdAt: 1}): sắp xếp theo thời gian giản dần
+                    // đếm toàn bộ số thông báo chưa đọc
+                    await Notifications.count({
+                        $and: [
+                            {"receiverId": currentUserId},
+                            {"isRead": false}
+                        ]
+                    }).then( async countNotiUnRead => {
+                        console.log(countNotiUnRead)
+                        // lấy ta thông tin người dùng của thông báo
+                        await Notifications.find({ "receiverId": currentUserId })
+                        .sort({createdAt: -1}) // sắp xếp mới về cũ
+                        .then( async notifications => {
+                            // tìm đến các người dùng của thông báo để lấy thông tin
+                            let getNotiContents = await notifications.map( async (notification) => {
+                                // vì hàm (notification) trên không đợi sender ở dưới. mà cứ return luôn nên thành Promise
+                                let sender = await Member.findById(notification.senderId).then(item => {return item});
+                                
+                                if (notification.type == "add_contact") {
+                                    if (!notification.isRead) {
+                                        return `
+                                            <div class="notif-readed-false" data-uid="${sender._id}">
+                                                <img class="avatar-small" src="${sender.image_path}" alt=""> 
+                                                <strong>
+                                                    ${sender.info.firstname} ${sender.info.lastname}
+                                                </strong> sent a friend request.
+                                            </div>
+                                        `;
+                                    }
+                                    return `
+                                        <div data-uid="${sender._id}">
+                                            <img class="avatar-small" src="${sender.image_path}" alt=""> 
+                                            <strong>
+                                                ${sender.info.firstname} ${sender.info.lastname}
+                                            </strong> sent a friend request.
+                                        </div>
+                                    `;
+                                } else {
+                                    if (!notification.isRead) {
+                                        return `
+                                            <div class="notif-readed-false" data-uid="${sender._id}">
+                                                <img class="avatar-small" src="${sender.image_path}" alt=""> 
+                                                <strong>
+                                                    ${sender.info.firstname} ${sender.info.lastname}
+                                                </strong> accepted the friend request.
+                                            </div>
+                                        `;
+                                    }
+                                    return `
+                                        <div data-uid="${sender._id}">
+                                            <img class="avatar-small" src="${sender.image_path}" alt=""> 
+                                            <strong>
+                                                ${sender.info.firstname} ${sender.info.lastname}
+                                            </strong> accepted the friend request.
+                                        </div>
+                                    `;
+                                }
+                            })
+                            // tránh Promise object ở phía trên, ta dùng: await Promise.all()
+                            let getNotiContentsToRender = await Promise.all(getNotiContents);
+                                
+                            await res.render('frontend/chatapp/home', {
+                                pageTitle: 'WebChat',
+                                member   : member,
+                                group    : group,
+                                messages : messages,
+                                contacts : contacts,
+                                notifications : notifications,
+                                countNotiUnRead : countNotiUnRead,
+                                getNotiContents : getNotiContentsToRender,
+                                messagesWelcome : messagesWelcome,
+                                messagesChangepassword : messagesChangepassword,
+                                messageEditProfile : messageEditProfile,
+                            })
+                        })
                     })
                 })
             })
@@ -548,13 +615,25 @@ exports.addNewContact = (req, res, next) => {
                 return res.status(200).send({contactExits: contactExits});
             }
             else {
+                // thêm bạn
                 newContactItem.memberId = currentUserId;
                 newContactItem.contactId = contactId;
-
                 newContactItem.save();
 
+                // tạo thông báo mới
+                let newNotification = new Notifications();
+                newNotification.senderId = currentUserId;
+                newNotification.receiverId = contactId;
+                newNotification.type = 'add_contact';
+                newNotification.isRead = false;
+                newNotification.save();
+
                 let success = true;
-                return res.status(200).send({newContactItem: newContactItem, success: success});
+
+                return res.status(200).send({
+                    newContactItem: newContactItem, 
+                    success: success
+                });
             }
         });
     } catch (error) {
@@ -562,17 +641,28 @@ exports.addNewContact = (req, res, next) => {
     }
 }
 
-// hủy yêu cầu kết bạn - remove request ontact
-exports.removeRequestContact = (req, res, next) => {
+// hủy yêu cầu kết bạn - remove request contact 
+exports.removeRequestContact = async (req, res, next) => {
     try {
         let currentUserId = req.session.user._id;
         let contactId = req.body.uid;
 
-        Contacts.findOne({"memberId": currentUserId,"contactId": contactId})
-        .then(removeRequest => {
+        await Contacts.findOne({"memberId": currentUserId, "contactId": contactId})
+        .then( async removeRequest => {
+            // xóa yêu cầu kết bạn
             removeRequest.remove();
+            // xóa thông báo
+            await Notifications.findOne({
+                $and: [
+                    {"senderId": currentUserId},
+                    {"receiverId": contactId},
+                    {"type": "add_contact"}
+                ]
+            }).then(noti => {
+                noti.remove();
 
-            return res.status(200).send(true);
+                return res.status(200).send(true);
+            })
         })
     } catch (error) {
         return res.status(500).send(error)

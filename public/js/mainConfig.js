@@ -94,12 +94,14 @@ function showModalContacts() {
 }
 
 function configNotification() {
+  // click nút đánh dấu tất cả thông báo là đã đọc
   $('#noti_Button').click(function() {
     $('#notifications').fadeToggle('fast', 'linear');
     $('.noti_counter').fadeOut('slow');
     return false;
   });
-  $(document).click(function() {
+  // click ra ngoài thì ẩn khung chứa thông báo
+  $(".main-content").click(function() {
     $('#notifications').fadeOut('fast', 'linear');
   });
 }

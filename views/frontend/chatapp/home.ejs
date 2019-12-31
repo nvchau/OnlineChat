@@ -10,7 +10,7 @@
 <body>
     <% include ../../layouts/navbar %>
     
-    <div class="container-fluid">
+    <div class="container-fluid main-content">
         <div class="row content">
             <!-- left -->
             <% include sections/leftSidenav %>
@@ -31,11 +31,14 @@
             <% include modals/attachmentsModal %>
             <!-- contacts -->
             <% include modals/contactsModal %>
+            <!-- notification - tất cả thông báo -->
+            <% include modals/allNotifications %>
         </div>
         <b style="float: right; color: honeydew; margin-top: 3px;">Make by Châu Nguyễn</b>
 
         <input type="hidden" name="currentUserId" id="currentUserId" value="<%= user._id %>">
         <input type="hidden" name="currentUserName" id="currentUserName" value="<%= user.info.firstname %> <%= user.info.lastname %>">
+        <input type="hidden" name="currentUserEmail" id="currentUserEmail" value="<%= user.local.email %>">
 
         <% if (messagesWelcome) {%>
             <input type="hidden" name="messages" id="messages" value="<%= messagesWelcome %>">
