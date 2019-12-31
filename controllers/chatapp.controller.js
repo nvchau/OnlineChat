@@ -33,10 +33,10 @@ exports.home = async (req, res, next) => {
     
     let currentUserId = req.session.user._id;
 
-    await Member.find().sort({createdAt: -1}).then( async member => { //{ _id: req.session.user._id }
-        await Contacts.find().sort({createdAt: -1}).then( async contacts => {
+    await Member.find().sort({"createdAt": -1}).then( async member => { //{ _id: req.session.user._id }
+        await Contacts.find().sort({"createdAt": -1}).then( async contacts => {
             await Group.find().then( async group => {
-                await Messages.find().sort({createdAt: 1}).then( async messages => { //.sort({createdAt: 1}): sắp xếp theo thời gian giản dần
+                await Messages.find().sort({"createdAt": 1}).then( async messages => { //.sort({"createdAt": 1}): sắp xếp theo thời gian cũ đến mới
                     // đếm toàn bộ số thông báo chưa đọc
                     await Notifications.count({
                         $and: [
@@ -44,15 +44,16 @@ exports.home = async (req, res, next) => {
                             {"isRead": false}
                         ]
                     }).then( async countNotiUnRead => {
-                        console.log(countNotiUnRead)
+                        // console.log(countNotiUnRead)
                         // lấy ta thông tin người dùng của thông báo
                         await Notifications.find({ "receiverId": currentUserId })
-                        .sort({createdAt: -1}) // sắp xếp mới về cũ
+                        .sort({"createdAt": -1}) // sắp xếp mới về cũ
+                        .limit(20) // giới hạn lấy ra là 20
                         .then( async notifications => {
                             // tìm đến các người dùng của thông báo để lấy thông tin
                             let getNotiContents = await notifications.map( async (notification) => {
                                 // vì hàm (notification) trên không đợi sender ở dưới. mà cứ return luôn nên thành Promise
-                                let sender = await Member.findById(notification.senderId).then(item => {return item});
+                                let sender = await Member.findById(notification.senderId).sort({"createdAt": -1}).then(item => {return item});
                                 
                                 if (notification.type == "add_contact") {
                                     if (!notification.isRead) {
@@ -666,5 +667,33 @@ exports.removeRequestContact = async (req, res, next) => {
         })
     } catch (error) {
         return res.status(500).send(error)
+    }
+}
+
+exports.markAllNotifiAsRead = async (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+        let targetUserJson = req.body.targetUserJson;
+        // chuyển Json thành mảng lại
+        let targetUser = JSON.parse(targetUserJson)
+        
+        await Notifications.find({
+            $and: [
+                {"receiverId": currentUserId},
+                {"senderId": {$in: targetUser}} // truyền mảng gồm các senderId của các notification | $in: nằm trong | $notin: không nằm trong
+            ]
+        }) 
+        .then(mark => {
+            // update isRead thành true
+            mark.forEach(item => {
+                item.isRead = true;
+                item.save();
+            });
+
+            return res.status(200).send({mark: mark});
+        })
+        
+    } catch (error) {
+        return res.status(500).send(error);
     }
 }

@@ -22,5 +22,7 @@ router.get('/search-user/:keywork', passport.isLoggedIn, chatapp_controller.sear
 router.post('/contact/add-new', passport.isLoggedIn, chatapp_controller.addNewContact);
 // hủy yêu cầu kết bạn (ajax) - remove request contact
 router.delete('/contact/remove-request-contact', passport.isLoggedIn, chatapp_controller.removeRequestContact);
+// đánh dấu tất cả thông báo là đã đọc
+router.put('/notification/mark-all-as-read', passport.isLoggedIn, chatapp_controller.markAllNotifiAsRead);
 
 module.exports = router;

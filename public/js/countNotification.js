@@ -20,9 +20,9 @@ function decreaseRequestContactNumber(className) {
 }
 
 // đếm số lượng thông báo tăng trên navbar
-function increaseRequestNotification(className) {
+function increaseRequestNotification(className, number) { // className: tên class của div, number: số lượng muốn tăng
     let currentValue = +$(`.${className}`).text(); // dấu cộng phía trước để chuyển string thành number - nếu rỗng thì mặc định trả về là số 0
-    currentValue += 1;
+    currentValue += number;
     if (currentValue === 0) {
         $(`.${className}`).css('display', 'none').html('');
     } else {
@@ -30,9 +30,9 @@ function increaseRequestNotification(className) {
     }
 }
 // đếm số lượng thông báo giảm trên navbar
-function decreaseRequestNotification(className) {
+function decreaseRequestNotification(className, number) {
     let currentValue = +$(`.${className}`).text(); // dấu cộng phía trước để chuyển string thành number - nếu rỗng thì mặc định trả về là số 0
-    currentValue -= 1;
+    currentValue -= number;
     if (currentValue === 0) {
         $(`.${className}`).css('display', 'none').html('');
     } else {

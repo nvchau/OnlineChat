@@ -188,8 +188,8 @@ $(document).ready(function() {
         // gọi hàm tăng số lượng thông báo ở contact management
         increaseRequestContactNumber("count-request-contact-received");
         // gọi hàm tăng số lượng thông báo ở navbar
-        increaseRequestNotification("noti_contact_counter");
-        increaseRequestNotification("noti_counter");
+        increaseRequestNotification("noti_contact_counter", 1);
+        increaseRequestNotification("noti_counter", 1);
 
         // đẩy lên danh sách chờ
         $(`#contactsModal #request-contact-received ul.contactList`).prepend(`
@@ -226,8 +226,8 @@ $(document).ready(function() {
         // gọi hàm giảm số lượng thông báo ở contact management
         decreaseRequestContactNumber("count-request-contact-received");
         // gọi hàm giảm số lượng thông báo ở navbar
-        decreaseRequestNotification("noti_contact_counter");
-        decreaseRequestNotification("noti_counter");
+        decreaseRequestNotification("noti_contact_counter", 1);
+        decreaseRequestNotification("noti_counter", 1);
 
         // xóa khỏi danh sách chờ
         $(`#contactsModal #request-contact-received ul.contactList li[data-uid = ${data.currentUserId}]`).remove();

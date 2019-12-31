@@ -49,10 +49,10 @@
                         <div id="noti_Container">
                             <div id="notifications">
                                 <!-- thông báo -->
-                                <a href="javascrip:void(0)" id="popup-mark-notif-as-read">Notifications</a> <!-- Mark all as read -->
+                                <a href="javascrip:void(0)" id="popup-mark-notif-as-read">Mark all as read</a>
                                 <div class="noti_content">
                                     <!-- để hiển thị được, lưu ý phải dùng <%- %> -->
-                                    <% getNotiContents.slice(-20).forEach(function(notiConctent_item, index){ %>
+                                    <% getNotiContents.forEach(function(notiConctent_item, index){ %>
                                         <%- notiConctent_item %>
                                     <% }); %>
                                 </div>

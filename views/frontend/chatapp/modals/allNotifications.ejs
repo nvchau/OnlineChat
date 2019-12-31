@@ -12,8 +12,8 @@
                     </a>
                 </div>
                 <hr>
-                <ul class="list-notifications">
-                    <% getNotiContents.slice(-20).forEach(function(notiConctent_item, index){ %>
+                <ul class="list-notifications"> <!-- thêm .slice(-20) vào sau getNotiContents để giới hạn hiển thị là 20 -->
+                    <% getNotiContents.forEach(function(notiConctent_item, index){ %> 
                         <li>
                             <%- notiConctent_item %>
                         </li>
