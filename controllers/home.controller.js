@@ -213,11 +213,11 @@ exports.postChangePassword = (req, res, next) => {
                         });
                     })
                 } else {
-                    req.flash('error', 'Invalid comfirm password.');
+                    req.flash('errorChangepassword', 'Invalid comfirm password.');
                     res.redirect('back');
                 }
             } else {
-                req.flash('error', 'Invalid current password.');
+                req.flash('errorChangepassword', 'Invalid current password.');
                 res.redirect('back');
             }
         })

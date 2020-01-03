@@ -84,12 +84,32 @@ io.on("connection", function(socket) {
                 });
             }
         })
-        // lắng nghe sự kiện hủy yêu cầu kết bạn
-        socket.on("remove-request-contact", function(data) {
+        // lắng nghe sự kiện hủy yêu cầu kết bạn của người gửi
+        socket.on("remove-request-contact-sent", function(data) {
             if (clientsObj[data.contactId]) {
                 clientsObj[data.contactId].forEach(socketId => {
-                    io.sockets.connected[socketId].emit("server-send-remove-request-contact", data);
+                    io.sockets.connected[socketId].emit("server-send-remove-request-contact-sent", data);
                 });
+            }
+        })
+        // lắng nghe sự kiện hủy yêu cầu kết bạn của người nhận
+        socket.on("remove-request-contact-received", function(data) {
+            if (clientsObj[data.contactId]) {
+                clientsObj[data.contactId].forEach(socketId => {
+                    io.sockets.connected[socketId].emit("server-send-remove-request-contact-received", data);
+                });
+            }
+        })
+        // lắng nghe đồng ý kết bạn
+        socket.on("acccept-contact-received", function(data) {
+            // nếu người được vừa thêm bạn đang online
+            if (clientsObj[data.contactId]) {
+                clientsObj[data.contactId].forEach(socketId => {
+                    io.sockets.connected[socketId].emit("server-send-acccept-contact-received", data);
+                });
+            } else { // nếu người được vừa thêm bạn đang offline thì trả về trạng thái
+                // trả lại trạng thái hoạt động của người vừa được đồng cho chính người dùng hiện tại
+                io.sockets.connected[socket.id].emit("server-send-acccept-contact-received-status", {offline: true, contactId: data.contactId});
             }
         })
 

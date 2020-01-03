@@ -33,6 +33,10 @@
             <% include modals/contactsModal %>
             <!-- notification - tất cả thông báo -->
             <% include modals/allNotifications %>
+            <!-- profile modal -->
+            <% include modals/profileModal %>
+            <!-- change password modal -->
+            <% include modals/changePasswordModal %>
         </div>
         <b style="float: right; color: honeydew; margin-top: 3px;">Make by Châu Nguyễn</b>
 
@@ -48,6 +52,9 @@
             <input type="hidden" name="messages" id="messages" value="<%= messageEditProfile %>">
         <% } %>
 
+        <% if (errorChangepassword) { %>
+            <input type="hidden" name="messagesError" id="messagesError" value="<%= errorChangepassword %>">
+        <% } %>
     </div>
 
     <% include ../../layouts/script %>
@@ -56,6 +63,10 @@
         var messages = $('#messages').val();
         if (messages) {
             alertify.success(messages);
+        }
+        var messagesError = $('#messagesError').val();
+        if (messagesError) {
+            alertify.error(messagesError);
         }
 
         // gửi id người vừa đăng nhập lên server để cập nhật danh sách online

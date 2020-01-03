@@ -23,6 +23,12 @@ exports.home = async (req, res, next) => {
     } else {
         messagesChangepassword = null;
     }
+    let errorChangepassword = req.flash('errorChangepassword');
+    if (errorChangepassword.length > 0) {
+        errorChangepassword = errorChangepassword[0];
+    } else {
+        errorChangepassword = null;
+    }
 
     let messageEditProfile = req.flash('messageEditProfile'); //message nhận từ flash của edit profile
     if (messageEditProfile.length > 0) {
@@ -34,9 +40,19 @@ exports.home = async (req, res, next) => {
     let currentUserId = req.session.user._id;
 
     await Member.find().sort({"createdAt": -1}).then( async member => { //{ _id: req.session.user._id }
-        await Contacts.find().sort({"createdAt": -1}).then( async contacts => {
+        await Contacts.find({
+            $or: [
+                {"memberId": currentUserId},
+                {"contactId": currentUserId}
+            ]
+        }).sort({"createdAt": -1}).then( async contacts => {
             await Group.find().then( async group => {
-                await Messages.find().sort({"createdAt": 1}).then( async messages => { //.sort({"createdAt": 1}): sắp xếp theo thời gian cũ đến mới
+                await Messages.find({
+                    $or: [
+                        {"senderId": currentUserId},
+                        {"receiverId": currentUserId}
+                    ]
+                }).sort({"createdAt": 1}).then( async messages => { //.sort({"createdAt": 1}): sắp xếp theo thời gian cũ đến mới
                     // đếm toàn bộ số thông báo chưa đọc
                     await Notifications.count({
                         $and: [
@@ -62,7 +78,7 @@ exports.home = async (req, res, next) => {
                                                 <img class="avatar-small" src="${sender.image_path}" alt=""> 
                                                 <strong>
                                                     ${sender.info.firstname} ${sender.info.lastname}
-                                                </strong> sent a friend request.
+                                                </strong> sent a contact request.
                                             </div>
                                         `;
                                     }
@@ -71,7 +87,7 @@ exports.home = async (req, res, next) => {
                                             <img class="avatar-small" src="${sender.image_path}" alt=""> 
                                             <strong>
                                                 ${sender.info.firstname} ${sender.info.lastname}
-                                            </strong> sent a friend request.
+                                            </strong> sent a contact request.
                                         </div>
                                     `;
                                 } else {
@@ -81,7 +97,7 @@ exports.home = async (req, res, next) => {
                                                 <img class="avatar-small" src="${sender.image_path}" alt=""> 
                                                 <strong>
                                                     ${sender.info.firstname} ${sender.info.lastname}
-                                                </strong> accepted the friend request.
+                                                </strong> accepted the contact request.
                                             </div>
                                         `;
                                     }
@@ -90,7 +106,7 @@ exports.home = async (req, res, next) => {
                                             <img class="avatar-small" src="${sender.image_path}" alt=""> 
                                             <strong>
                                                 ${sender.info.firstname} ${sender.info.lastname}
-                                            </strong> accepted the friend request.
+                                            </strong> accepted the contact request.
                                         </div>
                                     `;
                                 }
@@ -109,6 +125,7 @@ exports.home = async (req, res, next) => {
                                 getNotiContents : getNotiContentsToRender,
                                 messagesWelcome : messagesWelcome,
                                 messagesChangepassword : messagesChangepassword,
+                                errorChangepassword : errorChangepassword,
                                 messageEditProfile : messageEditProfile,
                             })
                         })
@@ -642,8 +659,8 @@ exports.addNewContact = (req, res, next) => {
     }
 }
 
-// hủy yêu cầu kết bạn - remove request contact 
-exports.removeRequestContact = async (req, res, next) => {
+// hủy yêu cầu kết bạn người dùng gửi đi - remove request contact sent
+exports.removeRequestContactSent = async (req, res, next) => {
     try {
         let currentUserId = req.session.user._id;
         let contactId = req.body.uid;
@@ -652,7 +669,7 @@ exports.removeRequestContact = async (req, res, next) => {
         .then( async removeRequest => {
             // xóa yêu cầu kết bạn
             removeRequest.remove();
-            // xóa thông báo
+            
             await Notifications.findOne({
                 $and: [
                     {"senderId": currentUserId},
@@ -660,6 +677,7 @@ exports.removeRequestContact = async (req, res, next) => {
                     {"type": "add_contact"}
                 ]
             }).then(noti => {
+                // xóa thông báo
                 noti.remove();
 
                 return res.status(200).send(true);
@@ -670,6 +688,77 @@ exports.removeRequestContact = async (req, res, next) => {
     }
 }
 
+// hủy yêu cầu kết bạn người dùng nhận được - remove request contact received
+exports.removeRequestContactReceived = async (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+        let contactId = req.body.uid;
+
+        await Contacts.findOne({"memberId": contactId, "contactId": currentUserId})
+        .then( async removeRequest => {
+            // xóa yêu cầu kết bạn
+            removeRequest.remove();
+            
+            await Notifications.findOne({
+                $and: [
+                    {"senderId": contactId},
+                    {"receiverId": currentUserId},
+                    {"type": "add_contact"}
+                ]
+            }).then(noti => {
+                // xóa thông báo
+                // noti.remove();
+
+                return res.status(200).send(true);
+            })
+        })
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+}
+
+// đồng ý kết bạn
+exports.accceptRequestContactReceived = async (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+        let contactId = req.body.uid;
+
+        await Contacts.findOne({"memberId": contactId, "contactId": currentUserId})
+        .then( async removeRequest => {
+            // đổi trang thái kết bạn thành true
+            removeRequest.status = true;
+            removeRequest.save();
+            
+            await Notifications.findOne({
+                $and: [
+                    {"senderId": contactId},
+                    {"receiverId": currentUserId},
+                    {"type": "add_contact"}
+                ]
+            }).then(async noti => {
+                // đổi trạng thái thông báo thành đã đọc
+                noti.isRead = true;
+                await noti.save();
+
+                // tạo thông báo mới và lưu (thông báo chấp nhận kết bạn)
+                let newNitiAccept = new Notifications();
+                newNitiAccept.senderId = currentUserId;
+                newNitiAccept.receiverId = contactId;
+                newNitiAccept.type = 'accept_contact';
+                newNitiAccept.isRead = false;
+                await newNitiAccept.save();
+
+                await Member.findOne({"_id": contactId}).then(newContact => {
+                    return res.status(200).send({newContact: newContact});
+                })
+            })
+        })
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+}
+
+// đánh dấu tất cả thông báo đã đọc
 exports.markAllNotifiAsRead = async (req, res, next) => {
     try {
         let currentUserId = req.session.user._id;
