@@ -200,8 +200,6 @@ function removeRequestContactReceived() {
 function acceptRequestContact() {
     $(`.user-acccept-contact-received`).unbind('click').on('click', function() {
         let targetId = $(this).data('uid');
-        let targetName = $(this).find('.user-name p').text();
-        let targetEmail = $(this).find('.user-address span').text();
 
         // xử dụng cú pháp delete (ajax)
         $.ajax({
@@ -330,8 +328,47 @@ function acceptRequestContact() {
 
                 // gọi lại hàm changeScreenChat để thay đổi màn hình chat
                 changeScreenChat();
+
+                // gọi hàm xóa bạn bè
+                removeContact();
             }
         })
+    })
+}
+// hủy kết bạn
+function removeContact() {
+    $('.user-remove-contact').unbind('click').on('click', function() {
+        let targetId = $(this).data('uid');
+        let targetName = $(`#contactsModal #contacts ul.contactList li[data-uid = ${targetId}] .user-name p`).text();
+
+        // form xác nhận xóa bạn
+        var mess = `<p>Are you sure you want to delete <b>${targetName}</b>?</p>`;
+        alertify.set({ labels: { ok: "Yes", cancel: "No" } });
+        alertify.confirm( mess, function (e) {
+            if (e) {
+                $.ajax({
+                    url: "/chatapp/contact/remove-contact",
+                    type: "delete",
+                    data: {uid: targetId},
+                    success: function(data) {
+                        // xóa khỏi danh sách bạn bè
+                        $(`#contactsModal #contacts ul.contactList li[data-uid = ${targetId}]`).remove();
+        
+                        // xóa khỏi danh sách chat bên leftSide
+                        $('#all-chat').find(`.person_chat li[data-chat = ${targetId}]`).remove();
+                        $('#user-chat').find(`.people li[data-chat = ${targetId}]`).remove();
+        
+                        // xóa hộp thoại trò chuyện phái rightside
+                        $(`#screen_chat div.right[data-chat = ${targetId}]`).remove();
+        
+                        // gửi sự kiện lên server
+                        socket.emit("remove-contact", {contactId: targetId, currentUserId: currentUserId});
+                    }
+                })
+            } else {
+                return false;
+            }
+        });
     })
 }
 
@@ -381,7 +418,7 @@ $(document).ready(function() {
                     </div>
                 </div>
             </li>
-        `)
+        `);
 
         // gọi hàm hủy yêu cầu kết bạn nhận được (người nhận)
         removeRequestContactReceived();
@@ -559,5 +596,27 @@ $(document).ready(function() {
         
         // gọi lại hàm changeScreenChat để thay đổi màn hình chat khi click
         changeScreenChat();
+
+        // GỌI HÀM XÓA BẠN BÈ
+        removeContact()
     })
+
+    // GỌI HÀM XÓA BẠN BÈ
+    removeContact();
+
+    // LẮNG NGHE SỰ KIỆN XÓA BẠN BÈ (NGƯỜI BỊ XÓA)
+    socket.on("server-send-remove-contact", function(data) {
+        // xóa khỏi danh sách bạn
+        $(`#contactsModal #contacts ul.contactList li[data-uid = ${data.currentUserId}]`).remove();
+
+        // xóa khỏi danh sách chat bên leftSide
+        $('#all-chat').find(`.person_chat li[data-chat = ${data.currentUserId}]`).remove();
+        $('#user-chat').find(`.people li[data-chat = ${data.currentUserId}]`).remove();
+
+        // xóa hộp thoại trò chuyện phái rightside
+        $(`#screen_chat div.right[data-chat = ${data.currentUserId}]`).remove();
+    })
+
+    // BẤM NÚT CHATTING TRONG DANH SÁCH CONTACT
+    
 })

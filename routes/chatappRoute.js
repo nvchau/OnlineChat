@@ -26,6 +26,8 @@ router.delete('/contact/remove-request-contact-sent', passport.isLoggedIn, chata
 router.delete('/contact/remove-request-contact-received', passport.isLoggedIn, chatapp_controller.removeRequestContactReceived);
 // chấp nhận yêu cầu kết bạn (ajax) - accept request contact
 router.put('/contact/acccept-contact-received', passport.isLoggedIn, chatapp_controller.accceptRequestContactReceived);
+// xóa bạn bè
+router.delete('/contact/remove-contact', passport.isLoggedIn, chatapp_controller.removeContact);
 // đánh dấu tất cả thông báo là đã đọc
 router.put('/notification/mark-all-as-read', passport.isLoggedIn, chatapp_controller.markAllNotifiAsRead);
 

@@ -786,3 +786,32 @@ exports.markAllNotifiAsRead = async (req, res, next) => {
         return res.status(500).send(error);
     }
 }
+
+// hủy kết bạn
+exports.removeContact = async (req, res, next) => {
+    try {
+        let currentUserId = req.session.user._id;
+        let contactId = req.body.uid;
+
+        await Contacts.findOne({
+            $or: [
+                {$and: [
+                    {"memberId": currentUserId},
+                    {"contactId": contactId}
+                ]},
+                {$and: [
+                    {"contactId": currentUserId},
+                    {"memberId": contactId}
+                ]},
+            ]
+        })
+        .then( async removeRequest => {
+            // xóa yêu cầu kết bạn
+            removeRequest.remove();
+            
+            return res.status(200).send({contactId: contactId});
+        })
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+}

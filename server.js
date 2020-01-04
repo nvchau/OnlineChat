@@ -112,6 +112,14 @@ io.on("connection", function(socket) {
                 io.sockets.connected[socket.id].emit("server-send-acccept-contact-received-status", {offline: true, contactId: data.contactId});
             }
         })
+        // lắng nghe sự kiện xóa bạn bè
+        socket.on("remove-contact", function(data) {
+            if (clientsObj[data.contactId]) {
+                clientsObj[data.contactId].forEach(socketId => {
+                    io.sockets.connected[socketId].emit("server-send-remove-contact", data);
+                });
+            }
+        })
 
         // =============== VIDEO CHAT ================
         // lắng nghe người gọi kiểm tra xem người nghe có online không
