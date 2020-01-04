@@ -331,6 +331,9 @@ function acceptRequestContact() {
 
                 // gọi hàm xóa bạn bè
                 removeContact();
+
+                // gọi hàm trỏ đến cuộc trò chuyện khi bấm chatting trong danh sách chat
+                chattingClick();
             }
         })
     })
@@ -369,6 +372,16 @@ function removeContact() {
                 return false;
             }
         });
+    })
+}
+// bấm nút chatting trong danh sách contact
+function chattingClick() {
+    $('.user-talk').unbind('click').on('click', function() {
+        let targetId = $(this).data('uid');
+        // click contact tương ứng bên leftside
+        $('ul.people').find(`li[data-chat = ${targetId}]`)[0].click();
+        // đóng contact modal 
+        $('#contactsModal').modal('toggle');
     })
 }
 
@@ -617,6 +630,6 @@ $(document).ready(function() {
         $(`#screen_chat div.right[data-chat = ${data.currentUserId}]`).remove();
     })
 
-    // BẤM NÚT CHATTING TRONG DANH SÁCH CONTACT
-    
+    // gọi hàm trỏ đến cuộc trò chuyện khi bấm chatting trong danh sách chat
+    chattingClick();
 })
